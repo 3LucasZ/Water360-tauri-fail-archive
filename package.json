@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@devicefarmer/adbkit": "^3.2.6",
     "@mantine/core": "^7.11.2",
     "@mantine/hooks": "^7.11.2",
     "next": "14.2.5",

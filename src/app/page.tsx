@@ -53,6 +53,24 @@ export default function Home() {
         >
           wakeonlan
         </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/under360", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                path:
+                  "/status/khadas?" +
+                  new URLSearchParams({
+                    freeSpace: "y",
+                    totalSpace: "y",
+                  }).toString(),
+              }),
+            });
+          }}
+        >
+          /status/khadas
+        </Button>
       </AppShell.Main>
     </AppShell>
   );
