@@ -1,31 +1,24 @@
-import Bluebird from "bluebird";
-import Adb from "@devicefarmer/adbkit";
+import { Adb, AdbServerClient, AdbSync, AdbTransport } from "@yume-chan/adb";
+import { AdbServerNodeTcpConnector } from "@yume-chan/adb-server-node-tcp";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const client = Adb.createClient();
+  const connector: AdbServerNodeTcpConnector = new AdbServerNodeTcpConnector({
+    host: "localhost",
+    port: 5037,
+  });
+  const client: AdbServerClient = new AdbServerClient(connector);
+  const selector: AdbServerClient.DeviceSelector = undefined;
+  const transport: AdbTransport = await client.createTransport(selector);
+  const adb: Adb = new Adb(transport);
 
-  const test = async () => {
-    try {
-      const devices = await client.listDevices();
-      await Bluebird.map(devices, async (device: any) => {
-        const files = await client.readdir(
-          device.id,
-          "/storage/emulated/0/Pictures/SDK_DEMO_EXPORT"
-        );
-        // Synchronous, so we don't have to care about returning at the
-        // right time
-        files.forEach((file: any) => {
-          if (file.isFile()) {
-            console.log(`[${device.id}] Found file "${file.name}"`);
-          }
-        });
-      });
-      console.log("Done checking /sdcard files on connected devices");
-    } catch (err) {
-      console.error("Something went wrong:", err.stack);
-    }
-  };
+  const sync: AdbSync = await adb.sync();
+  const files = await sync.readdir(
+    "/storage/emulated/0/Pictures/SDK_DEMO_EXPORT"
+  );
+  for (const file of files) {
+    console.log(file.name);
+  }
 
-  return NextResponse.json({ msg: "ok" }, { status: 200 });
+  return NextResponse.json({ message: "ok" }, { status: 200 });
 }
