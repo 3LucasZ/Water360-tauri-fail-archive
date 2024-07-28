@@ -10,17 +10,11 @@ import { Consumable } from "@yume-chan/stream-extra";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const device: AdbDaemonDirectSocketsDevice = new AdbDaemonDirectSocketsDevice(
-    {
-      host: "[2600:1700:bd80:1cb0:129:b4e0:5b6e:9aa2]",
-      port: 5555,
-    }
-  );
-
-  const connection: ReadableWritablePair<
-    AdbPacketData,
-    Consumable<AdbPacketInit>
-  > = await device.connect();
+  const util = require("util");
+  const exec = util.promisify(require("child_process").exec);
+  const { stdout, stderr } = await exec("adb devices");
+  console.log("stdout:", stdout);
+  console.log("stderr:", stderr);
 
   return NextResponse.json({ message: "ok" }, { status: 200 });
 }

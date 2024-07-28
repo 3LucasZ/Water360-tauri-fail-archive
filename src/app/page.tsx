@@ -153,6 +153,16 @@ export default function Home() {
         >
           /adb/checkActivity
         </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/adb/connect", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+          }}
+        >
+          /adb/connect
+        </Button>
       </AppShell.Main>
     </AppShell>
   );
