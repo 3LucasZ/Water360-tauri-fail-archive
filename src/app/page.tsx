@@ -43,9 +43,12 @@ export default function Home() {
       <AppShell.Main>
         <Button
           variant="filled"
-          onClick={() => {
-            var wol = require("wake_on_lan");
-            wol.wake("20:DE:20:DE:20:DE");
+          onClick={async () => {
+            const res = await fetch("/api/wol", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            });
           }}
         >
           wakeonlan
