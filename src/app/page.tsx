@@ -95,13 +95,13 @@ export default function Home() {
         </Button>
         <Button
           onClick={async () => {
-            const res = await fetch("/api/adb/ls", {
+            const res = await fetch("/api/adb/devices", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
             });
           }}
         >
-          /adb/ls
+          /adb/devices
         </Button>
       </AppShell.Main>
     </AppShell>

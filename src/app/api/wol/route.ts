@@ -5,5 +5,5 @@ export async function POST(request: NextRequest) {
   console.log("wol:", mac);
   const wol = require("wake_on_lan");
   wol.wake("c8:63:14:74:1f:96");
-  return NextResponse.json({ message: "Hello World" }, { status: 200 });
+  return NextResponse.json({ msg: "ok" }, { status: 200 });
 }
