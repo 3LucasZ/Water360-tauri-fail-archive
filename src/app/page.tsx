@@ -77,6 +77,24 @@ export default function Home() {
         </Button>
         <Button
           onClick={async () => {
+            under360("/inspect", {
+              url: "http://127.0.0.1:9099/DCIM/Camera01/IMG_20230621_051555_00_002.insp",
+            });
+          }}
+        >
+          /under360/inspect
+        </Button>
+        <Button
+          onClick={async () => {
+            under360("/export/image", {
+              url: "http://127.0.0.1:9099/DCIM/Camera01/IMG_20230621_051555_00_002.insp",
+            });
+          }}
+        >
+          /under360/export/image
+        </Button>
+        <Button
+          onClick={async () => {
             const res = await fetch("/api/adb/ls", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
