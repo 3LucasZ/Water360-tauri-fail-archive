@@ -12,6 +12,7 @@ import {
   Button,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { under360 } from "./services/api_helper";
 
 export default function Home() {
   const [opened, { toggle }] = useDisclosure();
@@ -51,25 +52,38 @@ export default function Home() {
             });
           }}
         >
-          wakeonlan
+          /wol
         </Button>
         <Button
           onClick={async () => {
-            const res = await fetch("/api/under360", {
+            under360("/status/khadas", { freeSpace: "y", totalSpace: "y" });
+          }}
+        >
+          /under360/status/khadas
+        </Button>
+        <Button
+          onClick={async () => {
+            under360("/ls");
+          }}
+        >
+          /under360/ls
+        </Button>
+        <Button
+          onClick={async () => {
+            under360("/command/connect");
+          }}
+        >
+          /under360/command/connect
+        </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/adb/ls", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                path:
-                  "/status/khadas?" +
-                  new URLSearchParams({
-                    freeSpace: "y",
-                    totalSpace: "y",
-                  }).toString(),
-              }),
             });
           }}
         >
-          /status/khadas
+          /adb/ls
         </Button>
       </AppShell.Main>
     </AppShell>
