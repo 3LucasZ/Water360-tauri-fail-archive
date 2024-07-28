@@ -8,6 +8,9 @@ export async function POST(request: NextRequest) {
     port: 5037,
   });
   const client: AdbServerClient = new AdbServerClient(connector);
+  const selector: AdbServerClient.DeviceSelector = undefined;
+  const transport: AdbTransport = await client.createTransport(selector);
+  const adb: Adb = new Adb(transport);
 
   const devices = await client.getDevices();
   console.log(devices);

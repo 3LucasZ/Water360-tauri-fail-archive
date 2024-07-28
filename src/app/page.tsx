@@ -123,6 +123,36 @@ export default function Home() {
         >
           /adb/pull
         </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/adb/test", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+          }}
+        >
+          /adb/test
+        </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/adb/startActivity", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+          }}
+        >
+          /adb/startActivity
+        </Button>
+        <Button
+          onClick={async () => {
+            const res = await fetch("/api/adb/checkActivity", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+          }}
+        >
+          /adb/checkActivity
+        </Button>
       </AppShell.Main>
     </AppShell>
   );
