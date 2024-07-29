@@ -10,6 +10,7 @@ import {
   CheckIcon,
   rem,
   Button,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { under360 } from "./services/api_helper";
@@ -23,14 +24,13 @@ export default function Home() {
       navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShell.Header c={"blue"}>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <CheckIcon
-            style={{ width: rem(20), height: rem(20) }}
-            color="var(--mantine-color-blue-filled)"
-          />
-          water360
+          <Image src={"logo.svg"} width={30} height={30} alt={""} />
+          <Title order={3} c="blue">
+            Water360
+          </Title>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
