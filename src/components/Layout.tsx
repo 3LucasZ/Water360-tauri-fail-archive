@@ -35,14 +35,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { link: "/settings", label: "Settings", icon: IconSettings },
   ];
   const pathname = usePathname();
-  const navLinks = navLinkDatas.map((item) => (
+  console.log(pathname);
+  const navLinks = navLinkDatas.map((Item) => (
     <NavLink
-      key={item.label}
-      href={item.link}
-      label={item.label}
-      leftSection={<item.icon />}
+      key={Item.label}
+      href={Item.link}
+      label={Item.label}
+      leftSection={<Item.icon />}
       variant="filled"
-      active={item.link == pathname}
+      active={Item.link == pathname}
     />
   ));
 
