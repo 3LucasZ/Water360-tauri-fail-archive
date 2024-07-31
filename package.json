@@ -10,15 +10,18 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@devicefarmer/adbkit": "^3.2.6",
     "@mantine/core": "^7.11.2",
     "@mantine/hooks": "^7.11.2",
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
+    "@types/three": "^0.167.1",
     "@yume-chan/adb": "^0.0.24",
     "@yume-chan/adb-server-node-tcp": "^0.0.24",
     "@yume-chan/stream-extra": "^0.0.24",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
+    "three": "^0.167.0",
     "wake_on_lan": "^1.0.0"
   },
   "devDependencies": {
