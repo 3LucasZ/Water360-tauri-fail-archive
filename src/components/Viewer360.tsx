@@ -3,21 +3,39 @@
 import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { BackSide, TextureLoader } from "three";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type Props = {
   url: string;
 };
 export function Viewer360(props: Props) {
-  function Dome() {
-    const texture = useLoader(TextureLoader, "360.jpg");
-    return (
-      <mesh>
-        <sphereGeometry attach="geometry" args={[500, 60, 40]} />
-        <meshBasicMaterial attach="material" map={texture} side={BackSide} />
-      </mesh>
-    );
-  }
+  const [video] = useState(() => {
+    const vid = document.createElement("video");
+    vid.src = "360.mp4";
+    vid.crossOrigin = "Anonymous";
+    vid.loop = true;
+    vid.muted = true;
+    vid.autoplay = true;
+    vid.playsInline = true;
+    //set the max time
+    // set({ timestamp: { max: vid.duration } })
+    // Update Leva
+    // vid.ontimeupdate = () => set({ timestamp: vid.currentTime });
+    return vid;
+  });
+
+  useEffect(() => {
+    video.play();
+  }, [video]);
+  // const [video] = useState(() => {
+  //   const el = document.createElement("video");
+  //   el.src = "360.mp4";
+  //   el.crossOrigin = "Anonymous";
+  //   el.play();
+  //   return el;
+  // });
+  const texture = useLoader(TextureLoader, "360.jpg");
+
   return (
     <Canvas camera={{ position: [0, 0, 0.1] }}>
       <OrbitControls
@@ -29,7 +47,15 @@ export function Viewer360(props: Props) {
         rotateSpeed={-0.5}
       />
       <Suspense fallback={null}>
-        <Dome />
+        <mesh>
+          <sphereGeometry attach="geometry" args={[500, 60, 40]} />
+          {/* <meshBasicMaterial attach="material" map={texture} side={BackSide}>
+            <videoTexture attach={"map"} args={[video]} />
+          </meshBasicMaterial> */}
+          <meshBasicMaterial side={BackSide}>
+            <videoTexture attach={"map"} args={[video]} />
+          </meshBasicMaterial>
+        </mesh>
       </Suspense>
     </Canvas>
   );
