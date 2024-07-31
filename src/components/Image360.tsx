@@ -9,11 +9,11 @@ import { AspectRatio } from "@mantine/core";
 type Props = {
   url: string;
 };
-export function Image360(props: Props) {
+export default function Image360(props: Props) {
   const texture = useLoader(TextureLoader, props.url);
   return (
     <AspectRatio ratio={1080 / 720}>
-      <Canvas camera={{ position: [0, 0, 0] }}>
+      <Canvas camera={{ position: [0, 0, 0.1] }}>
         <OrbitControls
           enableZoom={false}
           enablePan={false}

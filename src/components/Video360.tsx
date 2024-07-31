@@ -9,7 +9,7 @@ import { AspectRatio, Slider, Stack } from "@mantine/core";
 type Props = {
   url: string;
 };
-export function Viewer360(props: Props) {
+export default function Video360(props: Props) {
   const [video] = useState(() => {
     const vid = document.createElement("video");
     vid.src = "360.mp4";
