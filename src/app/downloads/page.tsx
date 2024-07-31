@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <Stack>
       <Image360 url={"360.jpg"} />
-      <Video360 url={""} />
+      <Video360 url={"360.mp4"} />
     </Stack>
   );
 }
