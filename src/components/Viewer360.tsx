@@ -1,27 +1,36 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import { BackSide, TextureLoader } from "three";
+import { Suspense } from "react";
 
 type Props = {
   url: string;
 };
 export function Viewer360(props: Props) {
-  return (
-    // <Canvas camera={{ zoom: 5, position: [0, 0, 0] }}>
-    //   <OrbitControls />
-    //   <mesh position={[0, 0, 0]}>
-    //     <sphereGeometry args={[15, 32, 16]} />
-    //     <meshBasicMaterial color={"#FEB2B2"} />
-    //   </mesh>
-    // </Canvas>
-    <Canvas>
-      <ambientLight intensity={0.1} />
-      <directionalLight color="red" position={[0, 0, 5]} />
+  function Dome() {
+    const texture = useLoader(TextureLoader, "360.jpg");
+    return (
       <mesh>
-        <boxGeometry />
-        <meshStandardMaterial />
+        <sphereGeometry attach="geometry" args={[500, 60, 40]} />
+        <meshBasicMaterial attach="material" map={texture} side={BackSide} />
       </mesh>
+    );
+  }
+  return (
+    <Canvas camera={{ position: [0, 0, 0.1] }}>
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        enableDamping
+        dampingFactor={0.2}
+        // autoRotate
+        rotateSpeed={-0.5}
+      />
+      <Suspense fallback={null}>
+        <Dome />
+      </Suspense>
     </Canvas>
   );
 }
