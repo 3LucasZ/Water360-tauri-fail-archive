@@ -16,7 +16,7 @@ export default function Video360(props: Props) {
     vid.crossOrigin = "Anonymous";
     vid.loop = true;
     vid.muted = true;
-    // vid.autoplay = true;
+    vid.autoplay = true;
     vid.playsInline = true;
     //set the max time
     // set({ timestamp: { max: vid.duration } })
