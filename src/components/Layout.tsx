@@ -1,6 +1,15 @@
 "use client";
 
-import { NavLink, AppShell, Burger, Title, Group } from "@mantine/core";
+import {
+  NavLink,
+  AppShell,
+  Burger,
+  Title,
+  Group,
+  useMantineColorScheme,
+  ActionIcon,
+  useComputedColorScheme,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconCapture,
@@ -16,6 +25,8 @@ import {
   IconSmartHome,
   IconPhoto,
   IconCamera,
+  IconSun,
+  IconMoon,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -24,6 +35,9 @@ import path from "path";
 import { useState } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  //--COLOR MODE--
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light");
   //--NAVLINK--
   const [opened, { toggle }] = useDisclosure();
   const navLinkDatas = [
@@ -42,7 +56,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       key={Item.label}
       href={Item.link}
       label={Item.label}
-      leftSection={<Item.icon />}
+      leftSection={<Item.icon stroke={1.5} />}
       variant="filled"
       active={Item.link == pathname}
     />
@@ -66,6 +80,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Title order={2} c="blue">
             Water360
           </Title>
+          <Group justify="end" flex={1}>
+            <ActionIcon
+              onClick={() => {
+                setColorScheme(
+                  computedColorScheme === "light" ? "dark" : "light"
+                );
+                document.body.style.background =
+                  colorScheme === "dark"
+                    ? "var(--mantine-color-white)"
+                    : "var(--mantine-color-dark-7)";
+                document.body.style.color =
+                  colorScheme === "dark"
+                    ? "var(--mantine-color-black)"
+                    : "var(--mantine-color-dark-0)";
+              }}
+              variant="default"
+              size="lg"
+              aria-label="Toggle color scheme"
+            >
+              {computedColorScheme === "dark" ? (
+                <IconSun stroke={1.5} />
+              ) : (
+                <IconMoon stroke={1.5} />
+              )}
+            </ActionIcon>
+          </Group>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>{navLinks}</AppShell.Navbar>
