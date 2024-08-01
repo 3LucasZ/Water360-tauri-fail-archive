@@ -14,6 +14,8 @@ import {
   IconHome,
   IconHome2,
   IconSmartHome,
+  IconPhoto,
+  IconCamera,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -26,9 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
   const navLinkDatas = [
     { link: "/", label: "Home", icon: IconHome },
-    { link: "/capture", label: "Capture", icon: IconCapture },
-    { link: "/record", label: "Record", icon: IconVideo },
-    { link: "/stream", label: "Stream", icon: IconBrandYoutube },
+    { link: "/capture", label: "Capture", icon: IconCamera },
     { link: "/status", label: "Status", icon: IconDashboard },
     { link: "/downloads", label: "Downloads", icon: IconEye },
     { link: "/remote", label: "Remote Media", icon: IconSubmarine },

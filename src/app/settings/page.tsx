@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack, TextInput } from "@mantine/core";
+import { PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { downloadDir } from "@tauri-apps/api/path";
 import { isValidIP } from "@/services/mini_helper";
@@ -8,6 +8,8 @@ import { isValidIP } from "@/services/mini_helper";
 export default function Home() {
   const [IP, setIP] = useState("");
   const [downloadDirPath, setDownloadDirPath] = useState("");
+  const [rtmpKey, setRtmpKey] = useState("xxxx-xxxx-xxxx-xxxx-xxxx");
+
   useEffect(() => {
     const load = async () => {
       const downloadDirPath = await downloadDir();
@@ -33,6 +35,14 @@ export default function Home() {
         disabled
       />
       <TextInput label={"Downloads folder"} value={downloadDirPath} disabled />
+      <PasswordInput
+        label={"RTMP key"}
+        value={rtmpKey}
+        onChange={(event) => {
+          const newRtmpKey = event.currentTarget.value;
+          setRtmpKey(newRtmpKey);
+        }}
+      />
     </Stack>
   );
 }
