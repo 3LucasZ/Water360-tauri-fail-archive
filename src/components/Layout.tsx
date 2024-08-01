@@ -77,7 +77,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppShell.Header c={"blue"}>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Image src={"logo.png"} width={30} height={30} alt={""} />
+          <Image src={"logo.png"} width={30} height={30} alt={""} priority />
           <Title order={2} c="blue">
             Water360
           </Title>

@@ -6,8 +6,8 @@ import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import Layout from "@/components/Layout";
 
 export const metadata = {
-  title: "My Mantine app",
-  description: "I have followed setup instructions carefully",
+  title: "Water360",
+  description: "Reliable 360 Camera Remote Control",
 };
 
 export default function RootLayout({
