@@ -32,12 +32,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import path from "path";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   //--COLOR MODE--
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light");
+
   //--NAVLINK--
   const [opened, { toggle }] = useDisclosure();
   const navLinkDatas = [
@@ -83,17 +84,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Group justify="end" flex={1}>
             <ActionIcon
               onClick={() => {
+                // updBodyColor();
                 setColorScheme(
                   computedColorScheme === "light" ? "dark" : "light"
                 );
-                document.body.style.background =
-                  colorScheme === "dark"
-                    ? "var(--mantine-color-white)"
-                    : "var(--mantine-color-dark-7)";
-                document.body.style.color =
-                  colorScheme === "dark"
-                    ? "var(--mantine-color-black)"
-                    : "var(--mantine-color-dark-0)";
               }}
               variant="default"
               size="lg"

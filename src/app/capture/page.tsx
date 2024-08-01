@@ -3,27 +3,16 @@
 import { useState } from "react";
 import {
   Center,
-  FloatingIndicator,
-  Group,
   rem,
   SegmentedControl,
   Stack,
-  UnstyledButton,
   Image,
   AspectRatio,
-  Box,
   Button,
 } from "@mantine/core";
-import classes from "./Demo.module.css";
 import {
   IconBrandYoutube,
   IconCapture,
-  IconCode,
-  IconLivePhoto,
-  IconLiveView,
-  IconPlayerEject,
-  IconPlayerPlay,
-  IconPlayerRecord,
   IconPlayerStop,
   IconVideo,
 } from "@tabler/icons-react";
