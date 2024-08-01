@@ -14,7 +14,7 @@ import {
   Text,
 } from "@mantine/core";
 import { IconPlayerPause, IconPlayerPlay } from "@tabler/icons-react";
-import { formatTime } from "@/services/format_helper";
+import { formatTime } from "@/services/mini_helper";
 
 type Props = {
   url: string;
