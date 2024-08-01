@@ -28,10 +28,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
   const navLinkDatas = [
     { link: "/", label: "Home", icon: IconHome },
-    { link: "/capture", label: "Capture", icon: IconCamera },
     { link: "/status", label: "Status", icon: IconDashboard },
-    { link: "/downloads", label: "Downloads", icon: IconEye },
+    { link: "/capture", label: "Capture", icon: IconCamera },
     { link: "/remote", label: "Remote Media", icon: IconSubmarine },
+    { link: "/downloads", label: "Downloads", icon: IconEye },
     { link: "/debug", label: "Debug", icon: IconBug },
     { link: "/settings", label: "Settings", icon: IconSettings },
   ];
