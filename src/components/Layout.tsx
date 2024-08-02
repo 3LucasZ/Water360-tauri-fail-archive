@@ -12,27 +12,18 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
-  IconCapture,
-  IconVideo,
-  IconBrandYoutube,
   IconDashboard,
   IconEye,
   IconSubmarine,
   IconBug,
   IconSettings,
   IconHome,
-  IconHome2,
-  IconSmartHome,
-  IconPhoto,
   IconCamera,
   IconSun,
   IconMoon,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useRouter } from "next/router";
-import path from "path";
-import { useEffect, useState } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   //--COLOR MODE--

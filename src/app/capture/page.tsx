@@ -16,15 +16,30 @@ import {
   IconPlayerStop,
   IconVideo,
 } from "@tabler/icons-react";
+import { under360 } from "@/services/api_helper";
+import Image360 from "@/components/Image360";
 
 export default function Home() {
   const [mode, setMode] = useState("Photo");
   const [isRecording, setIsRecording] = useState(false);
   const [isLivestreaming, setIsLivestreaming] = useState(false);
 
+  const [previewData, setPreviewData] = useState<any>();
+
   const photoFooter = (
     <Center>
-      <Button radius={"xl"} size="lg" w={300} color="blue">
+      <Button
+        radius={"xl"}
+        size="lg"
+        w={300}
+        color="blue"
+        onClick={async () => {
+          const res = await under360("/command/showPreview");
+          const json = await res.json();
+          console.log(json["data"]);
+          setPreviewData(json["data"]);
+        }}
+      >
         Capture
       </Button>
     </Center>
@@ -99,13 +114,16 @@ export default function Home() {
         <AspectRatio ratio={1080 / 720}>
           <Image
             radius="md"
-            src={null}
+            src={"data:image/png;base64," + previewData}
             fallbackSrc="https://placehold.co/600x400?text=Placeholder"
             alt=""
           />
         </AspectRatio>
+        <Image360 url={"data:image/png;base64," + previewData} />
         {footer}
       </Stack>
     </Center>
   );
 }
+
+const uri = "data:image/png;base64,";

@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     headers: { "Content-Type": "application/json" },
   });
   const resJson = await res.json();
-  console.log(resJson);
+  // console.log(resJson);
 
   return NextResponse.json(resJson, { status: res.status });
 }
