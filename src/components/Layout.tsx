@@ -93,7 +93,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Group>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar>{navLinks}</AppShell.Navbar>
+      <AppShell.Navbar>
+        {/* <AppShell.Section grow>{navLinks.slice(0, -1)}</AppShell.Section>
+        <AppShell.Section>{navLinks.at(-1)}</AppShell.Section> */}
+        {navLinks}
+      </AppShell.Navbar>
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   );

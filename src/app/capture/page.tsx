@@ -19,6 +19,7 @@ import {
 } from "@tabler/icons-react";
 import { under360 } from "@/services/api_helper";
 import Image360 from "@/components/Image360";
+import { responsiveBodyWidth } from "@/services/constants";
 
 export default function Home() {
   const [mode, setMode] = useState("Photo");
@@ -111,15 +112,15 @@ export default function Home() {
             };
           })}
         />
-        {previewData.length > 1 ? (
-          <Container maw={600}>
+        <Container fluid w={responsiveBodyWidth}>
+          {previewData.length > 1 ? (
             <Image360 url={"data:image/png;base64," + previewData} />
-          </Container>
-        ) : (
-          <AspectRatio ratio={1080 / 720} maw={600}>
-            <Image radius="md" alt="" />
-          </AspectRatio>
-        )}
+          ) : (
+            <AspectRatio ratio={1080 / 720}>
+              <Image alt="" bg={"dark.0"} />
+            </AspectRatio>
+          )}
+        </Container>
         {footer}
       </Stack>
     </Center>

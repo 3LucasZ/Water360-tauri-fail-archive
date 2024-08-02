@@ -1,3 +1,6 @@
+"use client";
+
+import { under360 } from "@/services/api_helper";
 import {
   Alert,
   Badge,
@@ -17,35 +20,49 @@ import {
 } from "@tabler/icons-react";
 import { IconAlertCircle } from "@tabler/icons-react";
 import commandExists from "command-exists";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const adbExists = commandExists.sync("adb");
-  const khadasPingable = false;
-  const khadasAdbConnected = false;
-  const khadasAppRunning = false;
-  const khadasServerRunning = false;
-  const cameraConnected = false;
+  const [stationStatus, setStationStatus] = useState({
+    adb: false,
+  });
+  const [khadasStatus, setKhadasStatus] = useState({
+    pingable: false,
+    connected: false,
+    running: false,
+  });
+  const [camStatus, setCamStatus] = useState({
+    connected: false,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // setStationStatus(await )
+      setCamStatus(await (await under360("/status/camera")).json());
+    };
+    fetchData(); // Initial fetch
+    const interval = setInterval(fetchData, 1000); // Fetch every second
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
   return (
     <Stack>
       <DeviceCard name="Ground Station">
-        <Badge color={adbExists ? "green" : "red"}>
-          ADB {adbExists ? "installed" : "not found"}
+        <Badge color={stationStatus["adb"] ? "green" : "red"}>
+          ADB {stationStatus["adb"] ? "installed" : "not found"}
         </Badge>
       </DeviceCard>
       <DeviceCard name="Khadas">
         <SimpleGrid cols={2}>
-          <Container gap={"xs"}>
-            <Badge color={khadasPingable ? "green" : "red"}>
-              {khadasPingable ? "detected" : "unpingable"}
+          <Container>
+            <Badge color={khadasStatus["pingable"] ? "green" : "red"}>
+              {khadasStatus["pingable"] ? "detected" : "unpingable"}
             </Badge>
-            <Badge color={khadasAdbConnected ? "green" : "red"}>
-              {khadasAdbConnected ? "connected" : "disconnected"}
+            <Badge color={khadasStatus["connected"] ? "green" : "red"}>
+              {khadasStatus["connected"] ? "connected" : "disconnected"}
             </Badge>
-            <Badge color={khadasAppRunning ? "green" : "red"}>
-              {khadasAppRunning ? "app on" : "app off"}
-            </Badge>
-            <Badge color={khadasServerRunning ? "green" : "red"}>
-              {khadasServerRunning ? "server on" : "server off"}
+            <Badge color={khadasStatus["running"] ? "green" : "red"}>
+              {khadasStatus["running"] ? "app on" : "app off"}
             </Badge>
           </Container>
           <MemoryDisplay used={30} total={100} />
@@ -54,8 +71,8 @@ export default function Home() {
       <DeviceCard name="Camera">
         <SimpleGrid cols={2}>
           <Container>
-            <Badge color={cameraConnected ? "green" : "red"}>
-              {cameraConnected ? "Connected" : "Disconnected"}
+            <Badge color={camStatus["connected"] ? "green" : "red"}>
+              {camStatus["connected"] ? "Connected" : "Disconnected"}
             </Badge>
           </Container>
           <MemoryDisplay used={30} total={100} />
