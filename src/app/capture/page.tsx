@@ -9,6 +9,7 @@ import {
   Image,
   AspectRatio,
   Button,
+  Container,
 } from "@mantine/core";
 import {
   IconBrandYoutube,
@@ -24,7 +25,7 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [isLivestreaming, setIsLivestreaming] = useState(false);
 
-  const [previewData, setPreviewData] = useState<any>();
+  const [previewData, setPreviewData] = useState("");
 
   const photoFooter = (
     <Center>
@@ -36,7 +37,6 @@ export default function Home() {
         onClick={async () => {
           const res = await under360("/command/showPreview");
           const json = await res.json();
-          console.log(json["data"]);
           setPreviewData(json["data"]);
         }}
       >
@@ -111,16 +111,14 @@ export default function Home() {
             };
           })}
         />
-        <AspectRatio ratio={1080 / 720}>
-          <Image
-            radius="md"
-            src={"data:image/png;base64," + previewData}
-            fallbackSrc="https://placehold.co/600x400?text=Placeholder"
-            alt=""
-          />
-        </AspectRatio>
-        {previewData && (
-          <Image360 url={"data:image/png;base64," + previewData} />
+        {previewData.length > 1 ? (
+          <Container maw={600}>
+            <Image360 url={"data:image/png;base64," + previewData} />
+          </Container>
+        ) : (
+          <AspectRatio ratio={1080 / 720} maw={600}>
+            <Image radius="md" alt="" />
+          </AspectRatio>
         )}
         {footer}
       </Stack>
