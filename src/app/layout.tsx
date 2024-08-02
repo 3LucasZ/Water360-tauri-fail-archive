@@ -1,9 +1,11 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import Layout from "@/components/Layout";
+import { Notifications } from "@mantine/notifications";
 
 export const metadata = {
   title: "Water360",
@@ -22,6 +24,7 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider>
+          <Notifications />
           <Layout>{children}</Layout>
         </MantineProvider>
       </body>

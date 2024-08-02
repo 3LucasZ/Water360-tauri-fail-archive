@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { promise, sys } from "ping";
-
 import { getItem, init, setItem } from "node-persist";
-import { downloadDir } from "@tauri-apps/api/path";
 import { settingsDir } from "@/services/constants";
+
 export async function POST(request: NextRequest) {
   //get settings
   await init({
