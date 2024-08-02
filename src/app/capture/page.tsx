@@ -119,7 +119,9 @@ export default function Home() {
             alt=""
           />
         </AspectRatio>
-        <Image360 url={"data:image/png;base64," + previewData} />
+        {previewData && (
+          <Image360 url={"data:image/png;base64," + previewData} />
+        )}
         {footer}
       </Stack>
     </Center>
