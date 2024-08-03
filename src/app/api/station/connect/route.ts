@@ -10,6 +10,8 @@ import { wake } from "wake_on_lan";
 import { TextDecoderStream, WritableStream } from "@yume-chan/stream-extra";
 import { under360 } from "@/services/api_helper";
 
+//Perform full connect sequence (can take up to 1 minute)
+//TODO: Not implemented yet unless requested.
 export async function POST(request: NextRequest) {
   await init({
     dir: settingsDir,

@@ -6,6 +6,6 @@ import commandExists from "command-exists";
 
 export async function POST(request: NextRequest) {
   //---Status---
-  var adb = commandExists.sync("adb");
-  return NextResponse.json({ adb }, { status: 200 });
+  const adbInstalled = commandExists.sync("adb");
+  return NextResponse.json({ adbInstalled }, { status: 200 });
 }

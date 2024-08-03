@@ -25,12 +25,9 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   //station status
-  const [stationStatus, setStationStatus] = useState({
-    adb: false,
-  });
+  const [adbInstalled, setAdbInstalled] = useState(false);
   //khadas status
   const [pingable, setPingable] = useState(false);
-  console.log("pingable", pingable);
   const [adbConnected, setAdbConnected] = useState(false);
   const [isAppRun, setIsAppRun] = useState(false);
   //cam status
@@ -40,27 +37,30 @@ export default function Home() {
 
   useEffect(() => {
     const getData = async () => {
-      const res = (await (await api("/khadas/pingable")).json())["pingable"];
-      console.log("res", res);
-      setPingable(res);
+      //station status
+      setAdbInstalled(
+        (await (await api("/station/adbInstalled")).json())["adbInstalled"]
+      );
+      //khadas status
+      setPingable((await (await api("/khadas/pingable")).json())["pingable"]);
       setAdbConnected(
         (await (await api("/khadas/adbConnected")).json())["adbConnected"]
       );
       setIsAppRun((await (await api("/khadas/isAppRun")).json())["isAppRun"]);
-      // setStationStatus(await (await api("/station/status")).json());
-      // setStationStatus(await (await api("/khadas/status")).json());
-      // setCamStatus(await (await under360("/status/camera")).json());
+      //cam status
+      setCamStatus(await (await under360("/status")).json());
     };
     getData(); // Initial fetch
-    // const interval = setInterval(fetchData, 5000); // Fetch every second
+    // Experimental infinite fetching
+    // const interval = setInterval(fetchData, 5000); // Infinite interval fetching
     // return () => clearInterval(interval); // Cleanup on unmount
-  });
+  }, []);
 
   return (
     <Stack>
       <DeviceCard name="Ground Station">
-        <Badge color={stationStatus["adb"] ? "green" : "red"}>
-          ADB {stationStatus["adb"] ? "installed" : "not found"}
+        <Badge color={adbInstalled ? "green" : "red"}>
+          ADB {adbInstalled ? "installed" : "not found"}
         </Badge>
       </DeviceCard>
       <DeviceCard name="Khadas">
