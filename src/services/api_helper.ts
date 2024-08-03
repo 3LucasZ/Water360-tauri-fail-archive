@@ -7,7 +7,7 @@ export async function under360(route: string, params?: Record<string, string>) {
       path,
     }),
   });
-  console.log(route);
+  console.log("/under360" + route);
   console.log(params);
   return res;
 }

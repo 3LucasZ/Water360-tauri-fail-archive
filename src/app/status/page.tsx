@@ -25,33 +25,36 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   //station status
-  const [adbInstalled, setAdbInstalled] = useState(false);
+  const [adbInstalled, setAdbInstalled] = useState(undefined);
   //khadas status
-  const [pingable, setPingable] = useState(false);
-  const [adbConnected, setAdbConnected] = useState(false);
-  const [isAppRun, setIsAppRun] = useState(false);
+  const [pingable, setPingable] = useState(undefined);
+  const [adbConnected, setAdbConnected] = useState(undefined);
+  const [isAppRun, setIsAppRun] = useState(undefined);
   //cam status
   const [camStatus, setCamStatus] = useState({
-    connected: false,
+    connected: undefined,
   });
-
+  //initial data fetch
   useEffect(() => {
-    const getData = async () => {
-      //station status
-      setAdbInstalled(
-        (await (await api("/station/adbInstalled")).json())["adbInstalled"]
-      );
-      //khadas status
-      setPingable((await (await api("/khadas/pingable")).json())["pingable"]);
-      setAdbConnected(
-        (await (await api("/khadas/adbConnected")).json())["adbConnected"]
-      );
-      setIsAppRun((await (await api("/khadas/isAppRun")).json())["isAppRun"]);
-      //cam status
-      setCamStatus(await (await under360("/status")).json());
-    };
-    getData(); // Initial fetch
-    // Experimental infinite fetching
+    //station status
+    api("/station/adbInstalled").then((res) =>
+      res.json().then((json) => setAdbInstalled(json["adbInstalled"]))
+    );
+    //khadas status
+    api("/khadas/pingable").then((res) =>
+      res.json().then((json) => setPingable(json["pingable"]))
+    );
+    api("/khadas/adbConnected").then((res) =>
+      res.json().then((json) => setAdbConnected(json["adbConnected"]))
+    );
+    api("/khadas/isAppRun").then((res) =>
+      res.json().then((json) => setIsAppRun(json["isAppRun"]))
+    );
+    //cam status
+    under360("/status").then((res) =>
+      res.json().then((json) => setCamStatus(json))
+    );
+    // Experimental infinite data fetching
     // const interval = setInterval(fetchData, 5000); // Infinite interval fetching
     // return () => clearInterval(interval); // Cleanup on unmount
   }, []);
@@ -59,59 +62,83 @@ export default function Home() {
   return (
     <Stack>
       <DeviceCard name="Ground Station">
-        <Badge color={adbInstalled ? "green" : "red"}>
+        <Badge
+          color={adbInstalled ? "green" : "red"}
+          hidden={adbInstalled == undefined}
+        >
           ADB {adbInstalled ? "installed" : "not found"}
         </Badge>
       </DeviceCard>
       <DeviceCard name="Khadas">
         <SimpleGrid cols={2}>
           <Container>
-            <Badge color={pingable ? "green" : "red"}>
+            <Badge
+              color={pingable ? "green" : "red"}
+              hidden={pingable == undefined}
+            >
               {pingable ? "detected" : "unpingable"}
             </Badge>
-            <Button
-              radius={"xl"}
-              onClick={() => {
-                api("/khadas/wol");
-              }}
+
+            <Badge
+              color={adbConnected ? "green" : "red"}
+              hidden={adbConnected == undefined}
             >
-              Wake
-            </Button>
-            <Button
-              radius={"xl"}
-              onClick={() => {
-                api("/khadas/connect");
-              }}
-            >
-              Connect
-            </Button>
-            <Badge color={adbConnected ? "green" : "red"}>
               {adbConnected ? "connected" : "disconnected"}
             </Badge>
-            <Button
-              radius={"xl"}
-              onClick={() => {
-                api("/khadas/startActivity");
-              }}
+            <Badge
+              color={isAppRun ? "green" : "red"}
+              hidden={isAppRun == undefined}
             >
-              Start Activity
-            </Button>
-            <Badge color={isAppRun ? "green" : "red"}>
               {isAppRun ? "app on" : "app off"}
             </Badge>
           </Container>
           <MemoryDisplay used={30} total={100} />
         </SimpleGrid>
+        <Button
+          radius={"xl"}
+          onClick={() => {
+            api("/khadas/wol");
+          }}
+        >
+          Wake
+        </Button>
+        <Button
+          radius={"xl"}
+          onClick={() => {
+            api("/khadas/connect");
+          }}
+        >
+          Connect
+        </Button>
+        <Button
+          radius={"xl"}
+          onClick={() => {
+            api("/khadas/runApp");
+          }}
+        >
+          Start Activity
+        </Button>
       </DeviceCard>
       <DeviceCard name="Camera">
         <SimpleGrid cols={2}>
           <Container>
-            <Badge color={camStatus["connected"] ? "green" : "red"}>
-              {camStatus["connected"] ? "Connected" : "Disconnected"}
+            <Badge
+              color={camStatus.connected ? "green" : "red"}
+              hidden={camStatus.connected == undefined}
+            >
+              {camStatus.connected ? "Connected" : "Disconnected"}
             </Badge>
           </Container>
           <MemoryDisplay used={30} total={100} />
         </SimpleGrid>
+        <Button
+          radius={"xl"}
+          onClick={() => {
+            under360("/command/connect");
+          }}
+        >
+          Connect
+        </Button>
       </DeviceCard>
     </Stack>
   );

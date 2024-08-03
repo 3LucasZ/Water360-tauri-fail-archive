@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-  const resJson = await res.json();
   //return
-  return NextResponse.json(resJson, { status: res.status });
+  return res;
 }
