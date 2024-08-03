@@ -1,18 +1,32 @@
+import { settingsDir } from "@/services/constants";
+import { isValidIP } from "@/services/mini_helper";
 import { NextRequest, NextResponse } from "next/server";
+import { getItem, init } from "node-persist";
 
 export async function POST(request: NextRequest) {
+  //get IP
+  await init({
+    dir: settingsDir,
+  });
+  var IP = await getItem("IP");
+  if (!isValidIP(IP)) {
+    return NextResponse.json({ msg: "invalid IP" }, { status: 500 });
+  }
+  if (isValidIP(IP, true)) {
+    IP = "[" + IP + "]";
+  }
+  //create request
   const protocol = "http";
-  const host = "2600:1700:bd80:1cb0:129:b4e0:5b6e:9aa2";
   const port = 8080;
   const data = await request.json();
-  const call = protocol + "://" + "[" + host + "]:" + port + data.path;
+  const call = protocol + "://" + IP + ":" + port + data.path;
   console.log("under360:", call);
-
+  //perform request
   const res = await fetch(call, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
   const resJson = await res.json();
-
+  //return
   return NextResponse.json(resJson, { status: res.status });
 }

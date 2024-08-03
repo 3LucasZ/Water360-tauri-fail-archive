@@ -1,9 +1,20 @@
+import { settingsDir } from "@/services/constants";
 import { NextRequest, NextResponse } from "next/server";
+import { getItem, init } from "node-persist";
+import { wake } from "wake_on_lan";
 
 export async function POST(request: NextRequest) {
-  const mac = "c8:63:14:74:1f:96";
-  console.log("wol:", mac);
-  const wol = require("wake_on_lan");
-  wol.wake("c8:63:14:74:1f:96");
+  await init({
+    dir: settingsDir,
+  });
+  const MAC = await getItem("MAC");
+  console.log("wol:", MAC);
+  wake(MAC, function (error) {
+    if (error) {
+      // handle error
+    } else {
+      // done sending packets
+    }
+  });
   return NextResponse.json({ msg: "ok" }, { status: 200 });
 }

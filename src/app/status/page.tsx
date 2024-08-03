@@ -11,6 +11,7 @@ import {
   Paper,
   Card,
   Progress,
+  Button,
 } from "@mantine/core";
 import { RingProgress, SimpleGrid, Center, Group, rem } from "@mantine/core";
 import {
@@ -23,28 +24,37 @@ import commandExists from "command-exists";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  //station status
   const [stationStatus, setStationStatus] = useState({
     adb: false,
   });
-  const [khadasStatus, setKhadasStatus] = useState({
-    pingable: false,
-    connected: false,
-    running: false,
-  });
+  //khadas status
+  const [pingable, setPingable] = useState(false);
+  console.log("pingable", pingable);
+  const [adbConnected, setAdbConnected] = useState(false);
+  const [isAppRun, setIsAppRun] = useState(false);
+  //cam status
   const [camStatus, setCamStatus] = useState({
     connected: false,
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setStationStatus(await (await api("/station/status")).json());
-      setStationStatus(await (await api("/khadas/status")).json());
-      setCamStatus(await (await under360("/status/camera")).json());
+    const getData = async () => {
+      const res = (await (await api("/khadas/pingable")).json())["pingable"];
+      console.log("res", res);
+      setPingable(res);
+      setAdbConnected(
+        (await (await api("/khadas/adbConnected")).json())["adbConnected"]
+      );
+      setIsAppRun((await (await api("/khadas/isAppRun")).json())["isAppRun"]);
+      // setStationStatus(await (await api("/station/status")).json());
+      // setStationStatus(await (await api("/khadas/status")).json());
+      // setCamStatus(await (await under360("/status/camera")).json());
     };
-    fetchData(); // Initial fetch
+    getData(); // Initial fetch
     // const interval = setInterval(fetchData, 5000); // Fetch every second
     // return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
+  });
 
   return (
     <Stack>
@@ -56,14 +66,38 @@ export default function Home() {
       <DeviceCard name="Khadas">
         <SimpleGrid cols={2}>
           <Container>
-            <Badge color={khadasStatus["pingable"] ? "green" : "red"}>
-              {khadasStatus["pingable"] ? "detected" : "unpingable"}
+            <Badge color={pingable ? "green" : "red"}>
+              {pingable ? "detected" : "unpingable"}
             </Badge>
-            <Badge color={khadasStatus["connected"] ? "green" : "red"}>
-              {khadasStatus["connected"] ? "connected" : "disconnected"}
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/wol");
+              }}
+            >
+              Wake
+            </Button>
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/connect");
+              }}
+            >
+              Connect
+            </Button>
+            <Badge color={adbConnected ? "green" : "red"}>
+              {adbConnected ? "connected" : "disconnected"}
             </Badge>
-            <Badge color={khadasStatus["running"] ? "green" : "red"}>
-              {khadasStatus["running"] ? "app on" : "app off"}
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/startActivity");
+              }}
+            >
+              Start Activity
+            </Button>
+            <Badge color={isAppRun ? "green" : "red"}>
+              {isAppRun ? "app on" : "app off"}
             </Badge>
           </Container>
           <MemoryDisplay used={30} total={100} />

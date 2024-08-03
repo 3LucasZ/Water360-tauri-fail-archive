@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TextDecoderStream, WritableStream } from "@yume-chan/stream-extra";
 
 export async function POST(request: NextRequest) {
+  //adb dympsys
   const connector: AdbServerNodeTcpConnector = new AdbServerNodeTcpConnector({
     host: "localhost",
     port: 5037,
@@ -12,18 +13,19 @@ export async function POST(request: NextRequest) {
   const selector: AdbServerClient.DeviceSelector = undefined;
   const transport: AdbTransport = await client.createTransport(selector);
   const adb: Adb = new Adb(transport);
-
   const process = await adb.subprocess.spawn(
-    'am start -n "com.example.kotlininsta360demo/com.example.kotlininsta360demo.activity.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER'
+    "dumpsys activity activities | grep mResumedActivity"
   );
+  var msg = "";
   await process.stdout.pipeThrough(new TextDecoderStream("UTF8")).pipeTo(
     new WritableStream({
       write(chunk) {
-        console.log(chunk);
+        msg += chunk;
       },
     })
   );
   await process.kill();
-
-  return NextResponse.json({ message: "ok" }, { status: 200 });
+  const isAppRun = msg.includes("com.example.kotlininsta360demo");
+  //return
+  return NextResponse.json({ isAppRun }, { status: 200 });
 }

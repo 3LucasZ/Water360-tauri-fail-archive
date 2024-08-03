@@ -107,7 +107,13 @@ export default function Home() {
         radius={"xl"}
         size="lg"
         w={300}
-        onClick={() => {
+        onClick={async () => {
+          if (isLivestreaming) {
+            const res = await under360("/command/stopLive");
+          } else {
+            ws?.close();
+            const res = await under360("/command/startLive");
+          }
           setIsLivestreaming(!isLivestreaming);
         }}
         color={isLivestreaming ? "red" : "blue"}
