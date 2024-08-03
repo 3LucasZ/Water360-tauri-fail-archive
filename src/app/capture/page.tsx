@@ -10,6 +10,8 @@ import {
   AspectRatio,
   Button,
   Container,
+  Loader,
+  Paper,
 } from "@mantine/core";
 import {
   IconBrandYoutube,
@@ -25,6 +27,7 @@ import { isValidIP } from "@/services/mini_helper";
 
 export default function Home() {
   const [mode, setMode] = useState("Photo");
+  const [isCapturing, setIsCapturing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isLivestreaming, setIsLivestreaming] = useState(false);
 
@@ -33,23 +36,26 @@ export default function Home() {
 
   useEffect(() => {
     init();
-  }, []);
+  });
   async function init() {
-    var IP = (await (await api("/station/getSettings")).json())["IP"];
-    if (isValidIP(IP)) {
-      if (isValidIP(IP, true)) {
-        IP = "[" + IP + "]";
+    //prevent from binding ws twice
+    if (ws == undefined) {
+      var IP = (await (await api("/station/getSettings")).json())["IP"];
+      if (isValidIP(IP)) {
+        if (isValidIP(IP, true)) {
+          IP = "[" + IP + "]";
+        }
+        console.log("IP", IP);
+        const url = `ws://${IP}:8081/stream`;
+        console.log("URL", url);
+        const ws = new WebSocket(url);
+        setWs(ws);
+        ws.onmessage = async (e) => {
+          const msg = e.data;
+          // console.log(msg);
+          setPreviewData(msg);
+        };
       }
-      console.log("IP", IP);
-      const url = `ws://${IP}:8081/stream`;
-      console.log("URL", url);
-      const ws = new WebSocket(url);
-      setWs(ws);
-      ws.onmessage = async (e) => {
-        const msg = e.data;
-        // console.log(msg);
-        setPreviewData(msg);
-      };
     }
   }
 
@@ -61,12 +67,15 @@ export default function Home() {
         w={300}
         color="blue"
         onClick={async () => {
-          const res = await under360("/command/showPreview");
-          const json = await res.json();
-          setPreviewData(json["data"]);
+          const res = await under360("/command/capture");
+          setIsCapturing(true);
+          setTimeout(() => {
+            setIsCapturing(false);
+          }, 4000);
         }}
+        leftSection={!isCapturing && <IconCapture />}
       >
-        Capture
+        {isCapturing ? <Loader color="white" /> : "Capture"}
       </Button>
     </Center>
   );
@@ -76,7 +85,12 @@ export default function Home() {
         radius={"xl"}
         size="lg"
         w={300}
-        onClick={() => {
+        onClick={async () => {
+          if (isRecording) {
+            const res = await under360("/command/stopRecord");
+          } else {
+            const res = await under360("/command/startRecord");
+          }
           setIsRecording(!isRecording);
         }}
         color={isRecording ? "red" : "blue"}
@@ -137,15 +151,17 @@ export default function Home() {
             };
           })}
         />
-        <Container fluid w={responsiveBodyWidth}>
-          {previewData.length > 1 ? (
-            <Image360 url={"data:image/png;base64," + previewData} />
-          ) : (
-            <AspectRatio ratio={1080 / 720}>
-              <Image alt="" bg={"dark.0"} />
-            </AspectRatio>
-          )}
-        </Container>
+        <Paper radius={"lg"}>
+          <Container fluid w={responsiveBodyWidth}>
+            {previewData.length > 1 ? (
+              <Image360 url={"data:image/png;base64," + previewData} />
+            ) : (
+              <AspectRatio ratio={1080 / 720}>
+                <Image alt="" bg={"dark.0"} />
+              </AspectRatio>
+            )}
+          </Container>
+        </Paper>
         {footer}
       </Stack>
     </Center>

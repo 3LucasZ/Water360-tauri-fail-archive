@@ -123,6 +123,12 @@ function FileCard({
     bitrate: 0,
     creationTime: 0,
   });
+  useEffect(() => {
+    getData();
+  }, []);
+  async function getData() {
+    setData(await (await under360("/inspect", { url: filePath })).json());
+  } //TODO: cache the result FOREVER after you get it once
   const [isDeleting, setIsDeleting] = useState(false);
   return (
     <>
@@ -157,9 +163,6 @@ function FileCard({
                 px="0"
                 onClick={async () => {
                   open();
-                  setData(
-                    await (await under360("/inspect", { url: filePath })).json()
-                  );
                 }}
               >
                 <IconFileInfo stroke={1.5} />
