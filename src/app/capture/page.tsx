@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Center,
   rem,
@@ -17,9 +17,11 @@ import {
   IconPlayerStop,
   IconVideo,
 } from "@tabler/icons-react";
-import { under360 } from "@/services/api_helper";
+import { api, under360 } from "@/services/api_helper";
 import Image360 from "@/components/Image360";
 import { responsiveBodyWidth } from "@/services/constants";
+import { isValidIP } from "@/services/mini_helper";
+// import WebSocket from "ws";
 
 export default function Home() {
   const [mode, setMode] = useState("Photo");
@@ -27,6 +29,29 @@ export default function Home() {
   const [isLivestreaming, setIsLivestreaming] = useState(false);
 
   const [previewData, setPreviewData] = useState("");
+  const [ws, setWs] = useState<WebSocket | undefined>(undefined);
+
+  useEffect(() => {
+    init();
+  }, []);
+  async function init() {
+    var IP = (await (await api("/station/getSettings")).json())["IP"];
+    if (isValidIP(IP)) {
+      if (isValidIP(IP, true)) {
+        IP = "[" + IP + "]";
+      }
+      console.log("IP", IP);
+      const url = `ws://${IP}:8081/stream`;
+      console.log("URL", url);
+      const ws = new WebSocket(url);
+      setWs(ws);
+      ws.onmessage = async (e) => {
+        const msg = e.data;
+        // console.log(msg);
+        setPreviewData(msg);
+      };
+    }
+  }
 
   const photoFooter = (
     <Center>
