@@ -18,7 +18,10 @@ import {
   Container,
   TextInput,
   Table,
+  Modal,
+  List,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconDownload,
   IconFileExport,
@@ -44,6 +47,12 @@ export default function Home() {
     .filter((url) => url.toLowerCase().match(search.toLowerCase()))
     .map((url) => {
       const fileName = url.substring(url.lastIndexOf("/") + 1);
+      const fileType =
+        url.split(".").pop() == "insp"
+          ? 1
+          : fileName.substring(0, 3) == "LRV"
+          ? 3
+          : 2;
       const dateStr = url.split("_")[1];
       const yr = Number(dateStr.substring(0, 4));
       const m = Number(dateStr.substring(4, 6));
@@ -55,90 +64,114 @@ export default function Home() {
       return (
         <FileCard
           key={url}
+          filePath={url}
           fileName={fileName}
-          isPhoto={url.split(".").pop() == "insp"}
+          fileType={fileType}
           date={m + "/" + d + "/" + yr}
           time={hr + ":" + min + ":" + sec}
         />
       );
     });
   return (
-    <Stack>
-      <TextInput
-        leftSectionPointerEvents="none"
-        leftSection={<IconSearch />}
-        placeholder="File name"
-        value={search}
-        onChange={(event) => {
-          setSearch(event.target.value);
-        }}
-      />
+    <>
+      <Stack>
+        <TextInput
+          leftSectionPointerEvents="none"
+          leftSection={<IconSearch />}
+          placeholder="File name"
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+          }}
+        />
 
-      <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>
-        {cards}
-      </SimpleGrid>
-    </Stack>
+        <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>
+          {cards}
+        </SimpleGrid>
+      </Stack>
+    </>
   );
 }
 function FileCard({
+  filePath,
   fileName,
-  isPhoto,
+  fileType,
   date,
   time,
-  width,
-  height,
-  durationMs,
 }: {
+  filePath: string;
   fileName: string;
-  isPhoto: boolean;
+  fileType: number;
   date: string;
   time: string;
-  width?: number;
-  height?: number;
-  durationMs?: number;
 }) {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [data, setData] = useState({
+    height: 0,
+    width: 0,
+    fileSize: 0,
+    fps: 0,
+    durationInMs: 0,
+    bitrate: 0,
+    creationTime: 0,
+  });
   return (
-    <Card
-      // shadow="sm"
-      // padding="lg"
-      radius="md"
-      withBorder
-    >
-      <Stack>
-        <Text fw={500} truncate="end">
-          {fileName}
-        </Text>
+    <>
+      <Card radius="md" withBorder>
+        <Stack>
+          <Text fw={500} truncate="end">
+            {fileName}
+          </Text>
 
-        <Badge color={isPhoto ? "pink" : "indigo"}>
-          {isPhoto ? "Image" : "Video"}
-        </Badge>
-        <Text>{date + " " + time}</Text>
-        <Button.Group miw={"100%"}>
-          <Button color="yellow" variant="light" miw="40" px="0">
-            <IconFileInfo stroke={1.5} />
-          </Button>
-          <Button
-            color="blue"
-            variant="light"
-            fullWidth
-            leftSection={<IconDownload stroke={1.5} />}
+          <Badge
+            color={
+              fileType == 1 ? "violet" : fileType == 2 ? "indigo" : "grape"
+            }
           >
-            Export
-          </Button>
-          <Button color="red" variant="light" miw="40" px="0">
-            <IconTrash stroke={1.5} />
-          </Button>
-        </Button.Group>
-
-        {/* <Text size="sm" c="dimmed">
-          With Fjord Tours you can explore more of the magical fjord landscapes
-          with tours and activities on and around the fjords of Norway
-        </Text> */}
-
-        {/* <Button color="blue" fullWidth mt="md" radius="md">
-          Book classic tour now
-        </Button> */}
-      </Stack>
-    </Card>
+            {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
+          </Badge>
+          <Text>{date + " " + time}</Text>
+          <Button.Group miw={"100%"}>
+            <Button
+              color="yellow"
+              variant="light"
+              miw="40"
+              px="0"
+              onClick={async () => {
+                open();
+                setData(
+                  await (await under360("/inspect", { url: filePath })).json()
+                );
+              }}
+            >
+              <IconFileInfo stroke={1.5} />
+            </Button>
+            <Button
+              color="blue"
+              variant="light"
+              fullWidth
+              leftSection={<IconDownload stroke={1.5} />}
+            >
+              Export
+            </Button>
+            <Button color="red" variant="light" miw="40" px="0">
+              <IconTrash stroke={1.5} />
+            </Button>
+          </Button.Group>
+        </Stack>
+      </Card>
+      <Modal opened={opened} onClose={close} title="File Information" centered>
+        <List>
+          <List.Item>
+            Resolution: {data.height} x {data.width}
+          </List.Item>
+          <List.Item>FPS: {data.fps}</List.Item>
+          <List.Item>Duration: {data.durationInMs / 1000}</List.Item>
+          <List.Item>Bitrate: {data.bitrate}</List.Item>
+          <List.Item>Filesize: {data.fileSize}</List.Item>
+          <List.Item>Timestamp: {data.creationTime}</List.Item>
+        </List>
+      </Modal>
+    </>
   );
 }
