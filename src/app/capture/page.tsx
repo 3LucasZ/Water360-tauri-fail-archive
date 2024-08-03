@@ -12,6 +12,7 @@ import {
   Container,
   Loader,
   Paper,
+  Box,
 } from "@mantine/core";
 import {
   IconBrandYoutube,
@@ -151,17 +152,23 @@ export default function Home() {
             };
           })}
         />
-        <Paper radius={"lg"}>
-          <Container fluid w={responsiveBodyWidth}>
-            {previewData.length > 1 ? (
-              <Image360 url={"data:image/png;base64," + previewData} />
-            ) : (
-              <AspectRatio ratio={1080 / 720}>
-                <Image alt="" bg={"dark.0"} />
-              </AspectRatio>
-            )}
-          </Container>
-        </Paper>
+
+        <Box
+          w={responsiveBodyWidth}
+          style={(theme) => ({
+            borderRadius: theme.radius.lg,
+            overflow: "hidden",
+          })}
+        >
+          {previewData.length > 1 ? (
+            <Image360 url={"data:image/png;base64," + previewData} />
+          ) : (
+            <AspectRatio ratio={1080 / 720}>
+              <Image alt="" bg={"dark.0"} />
+            </AspectRatio>
+          )}
+        </Box>
+
         {footer}
       </Stack>
     </Center>

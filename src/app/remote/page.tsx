@@ -128,7 +128,7 @@ function FileCard({
   }, []);
   async function getData() {
     setData(await (await under360("/inspect", { url: filePath })).json());
-  } //TODO: cache the result FOREVER after you get it once
+  } //TODO: cache the result FOREVER after you get it once!!!
   const [isDeleting, setIsDeleting] = useState(false);
   return (
     <>
