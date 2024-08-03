@@ -20,6 +20,8 @@ import {
   Table,
   Modal,
   List,
+  LoadingOverlay,
+  Center,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -69,6 +71,7 @@ export default function Home() {
           fileType={fileType}
           date={m + "/" + d + "/" + yr}
           time={hr + ":" + min + ":" + sec}
+          refresh={getData}
         />
       );
     });
@@ -93,12 +96,14 @@ export default function Home() {
   );
 }
 function FileCard({
+  refresh,
   filePath,
   fileName,
   fileType,
   date,
   time,
 }: {
+  refresh: Function;
   filePath: string;
   fileName: string;
   fileType: number;
@@ -115,63 +120,92 @@ function FileCard({
     bitrate: 0,
     creationTime: 0,
   });
+  const [isDeleting, setIsDeleting] = useState(false);
   return (
     <>
-      <Card radius="md" withBorder>
-        <Stack>
-          <Text fw={500} truncate="end">
-            {fileName}
-          </Text>
+      <Box pos="relative">
+        <LoadingOverlay
+          visible={isDeleting}
+          zIndex={1000}
+          overlayProps={{
+            radius: "sm",
+            blur: 2,
+          }}
+        />
+        <Card radius="md" withBorder>
+          <Stack>
+            <Text fw={500} truncate="end">
+              {fileName}
+            </Text>
 
-          <Badge
-            color={
-              fileType == 1 ? "violet" : fileType == 2 ? "indigo" : "grape"
-            }
-          >
-            {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
-          </Badge>
-          <Text>{date + " " + time}</Text>
-          <Button.Group miw={"100%"}>
-            <Button
-              color="yellow"
-              variant="light"
-              miw="40"
-              px="0"
-              onClick={async () => {
-                open();
-                setData(
-                  await (await under360("/inspect", { url: filePath })).json()
-                );
-              }}
+            <Badge
+              color={
+                fileType == 1 ? "violet" : fileType == 2 ? "indigo" : "grape"
+              }
             >
-              <IconFileInfo stroke={1.5} />
-            </Button>
-            <Button
-              color="blue"
-              variant="light"
-              fullWidth
-              leftSection={<IconDownload stroke={1.5} />}
-            >
-              Export
-            </Button>
-            <Button color="red" variant="light" miw="40" px="0">
-              <IconTrash stroke={1.5} />
-            </Button>
-          </Button.Group>
-        </Stack>
-      </Card>
-      <Modal opened={opened} onClose={close} title="File Information" centered>
-        <List>
-          <List.Item>
-            Resolution: {data.height} x {data.width}
-          </List.Item>
-          <List.Item>FPS: {data.fps}</List.Item>
-          <List.Item>Duration: {data.durationInMs / 1000}</List.Item>
-          <List.Item>Bitrate: {data.bitrate}</List.Item>
-          <List.Item>Filesize: {data.fileSize}</List.Item>
-          <List.Item>Timestamp: {data.creationTime}</List.Item>
-        </List>
-      </Modal>
+              {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
+            </Badge>
+            <Text>{date + " " + time}</Text>
+            <Button.Group miw={"100%"}>
+              <Button
+                color="yellow"
+                variant="light"
+                miw="40"
+                px="0"
+                onClick={async () => {
+                  open();
+                  setData(
+                    await (await under360("/inspect", { url: filePath })).json()
+                  );
+                }}
+              >
+                <IconFileInfo stroke={1.5} />
+              </Button>
+              <Button
+                color="blue"
+                variant="light"
+                fullWidth
+                leftSection={<IconDownload stroke={1.5} />}
+              >
+                Export
+              </Button>
+              <Button
+                color="red"
+                variant="light"
+                miw="40"
+                px="0"
+                onClick={async () => {
+                  await under360("/rm", { url: filePath });
+                  setIsDeleting(true);
+                  setTimeout(() => {
+                    setIsDeleting(false);
+                    refresh();
+                  }, 5000);
+                }}
+              >
+                <IconTrash stroke={1.5} />
+              </Button>
+            </Button.Group>
+          </Stack>
+        </Card>
+        <Modal
+          opened={opened}
+          onClose={close}
+          title="File Information"
+          centered
+        >
+          <List>
+            <List.Item>
+              Resolution: {data.height} x {data.width}
+            </List.Item>
+            <List.Item>FPS: {data.fps}</List.Item>
+            <List.Item>Duration: {data.durationInMs / 1000}</List.Item>
+            <List.Item>Bitrate: {data.bitrate}</List.Item>
+            <List.Item>Filesize: {data.fileSize}</List.Item>
+            <List.Item>Timestamp: {data.creationTime}</List.Item>
+          </List>
+        </Modal>
+      </Box>
     </>
   );
 }
