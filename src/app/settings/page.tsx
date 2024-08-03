@@ -24,7 +24,6 @@ import { useRouter } from "next/navigation";
 import { notifications } from "@mantine/notifications";
 
 export default function Home() {
-  const router = useRouter();
   const [IP, setIP] = useState("");
   const [MAC, setMAC] = useState("");
   const [downloadsDir, setDownloadsDir] = useState("");

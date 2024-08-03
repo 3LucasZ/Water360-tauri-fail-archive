@@ -20,8 +20,9 @@ export function formatTime(sec_num: number) {
   return hours + minutes + ":" + seconds;
 }
 
-export function isValidIP(ip: string) {
+export function isValidIP(ip: string, v6?: boolean) {
   const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
   const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  if (v6) return ipv6Pattern.test(ip);
   return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
 }

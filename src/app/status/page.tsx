@@ -1,6 +1,6 @@
 "use client";
 
-import { under360 } from "@/services/api_helper";
+import { api, under360 } from "@/services/api_helper";
 import {
   Alert,
   Badge,
@@ -37,12 +37,13 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // setStationStatus(await )
+      setStationStatus(await (await api("/station/status")).json());
+      setStationStatus(await (await api("/khadas/status")).json());
       setCamStatus(await (await under360("/status/camera")).json());
     };
     fetchData(); // Initial fetch
-    const interval = setInterval(fetchData, 1000); // Fetch every second
-    return () => clearInterval(interval); // Cleanup on unmount
+    // const interval = setInterval(fetchData, 5000); // Fetch every second
+    // return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   return (

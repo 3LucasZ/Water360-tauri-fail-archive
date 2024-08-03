@@ -21,6 +21,7 @@
     "@types/node-persist": "^3.1.8",
     "@types/ping": "^0.4.4",
     "@types/three": "^0.167.1",
+    "@types/wake_on_lan": "^0.0.33",
     "@yume-chan/adb": "^0.0.24",
     "@yume-chan/adb-server-node-tcp": "^0.0.24",
     "@yume-chan/stream-extra": "^0.0.24",
