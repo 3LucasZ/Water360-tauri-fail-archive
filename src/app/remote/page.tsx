@@ -46,7 +46,10 @@ export default function Home() {
     getData();
   }, []);
   const cards = urls
-    .filter((url) => url.toLowerCase().match(search.toLowerCase()))
+    .filter(
+      (url) =>
+        url.toLowerCase().match(search.toLowerCase()) && !url.match("LRV")
+    )
     .map((url) => {
       const fileName = url.substring(url.lastIndexOf("/") + 1);
       const fileType =
@@ -140,7 +143,7 @@ function FileCard({
 
             <Badge
               color={
-                fileType == 1 ? "violet" : fileType == 2 ? "indigo" : "grape"
+                fileType == 1 ? "indigo" : fileType == 2 ? "grape" : "violet"
               }
             >
               {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
