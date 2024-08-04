@@ -53,7 +53,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       active={Item.link == pathname}
     />
   ));
-
+  //--TAURI--
+  document.addEventListener("contextmenu", (event) => event.preventDefault());
   //--RET--
   return (
     <AppShell
