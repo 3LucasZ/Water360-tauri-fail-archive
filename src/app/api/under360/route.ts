@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
   console.log("under360:", call);
   //perform request
   const forceCache = data.path.match("inspect");
-
   const res = forceCache
     ? await fetch(call, {
         method: "GET",

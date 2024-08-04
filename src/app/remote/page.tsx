@@ -23,8 +23,10 @@ import {
   List,
   LoadingOverlay,
   Center,
+  Loader,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import {
   IconDownload,
   IconFileExport,
@@ -40,8 +42,22 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [search, setSearch] = useState("");
   const [urls, setUrls] = useState<string[]>([]);
+  const [urlsLoading, setUrlsLoading] = useState(true);
   async function getData() {
-    setUrls((await (await under360("/ls")).json())["data"]);
+    under360("/ls").then((res) =>
+      res.json().then((json) => {
+        if (res.status != 200) {
+          notifications.show({
+            title: "Error",
+            message: json["err"],
+            color: "red",
+          });
+        } else {
+          setUrls(json["data"]);
+        }
+        setUrlsLoading(false);
+      })
+    );
   }
   useEffect(() => {
     getData();
@@ -91,7 +107,11 @@ export default function Home() {
             setSearch(event.target.value);
           }}
         />
-
+        {urlsLoading && (
+          <Center h="300" mah={"50vh"}>
+            <Loader size={"xl"} type="bars" color="pink" />
+          </Center>
+        )}
         <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>
           {cards}
         </SimpleGrid>
