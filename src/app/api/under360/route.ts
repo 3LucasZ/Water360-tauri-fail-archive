@@ -22,10 +22,18 @@ export async function POST(request: NextRequest) {
   const call = protocol + "://" + IP + ":" + port + data.path;
   console.log("under360:", call);
   //perform request
-  const res = await fetch(call, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
+  const forceCache = data.path.match("inspect");
+
+  const res = forceCache
+    ? await fetch(call, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "force-cache",
+      })
+    : await fetch(call, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
   //return
   return res;
 }
