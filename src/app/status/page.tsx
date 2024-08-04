@@ -125,7 +125,7 @@ export default function Home() {
               }}
               maw={300}
             >
-              Start Activity
+              Run App
             </Button>
           </Stack>
           <MemoryDisplay freeSpace={df.freeSpace} totalSpace={df.totalSpace} />

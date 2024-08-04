@@ -67,14 +67,14 @@ export default function Home() {
       const hr = Number(timeStr.substring(0, 2));
       const min = Number(timeStr.substring(2, 4));
       const sec = Number(timeStr.substring(4, 6));
+      const date = new Date(Date.UTC(yr, m, d, hr, min, sec));
       return (
         <FileCard
           key={url}
           filePath={url}
           fileName={fileName}
           fileType={fileType}
-          date={m + "/" + d + "/" + yr}
-          time={hr + ":" + min + ":" + sec}
+          date={date.toLocaleString()}
           refresh={getData}
         />
       );
@@ -105,14 +105,12 @@ function FileCard({
   fileName,
   fileType,
   date,
-  time,
 }: {
   refresh: Function;
   filePath: string;
   fileName: string;
   fileType: number;
   date: string;
-  time: string;
 }) {
   const [opened, { open, close }] = useDisclosure(false);
   const [data, setData] = useState({
@@ -153,7 +151,7 @@ function FileCard({
           >
             {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
           </Badge>
-          <Text>{date + " " + time}</Text>
+          <Text>{date}</Text>
           <Button.Group miw={"100%"}>
             <Button
               color="yellow"
@@ -217,7 +215,9 @@ function FileCard({
               Bitrate: {formatSize(data.bitrate)}
             </List.Item>
             <List.Item>Filesize: {formatSize(data.fileSize)}</List.Item>
-            {/* <List.Item>Timestamp: {data.creationTime}</List.Item> */}
+            <List.Item>
+              Timestamp: {new Date(data.creationTime).toLocaleString()}
+            </List.Item>
           </List>
         </Modal>
       </Box>
