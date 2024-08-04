@@ -1,6 +1,6 @@
 <p align="center">
   <img src="public/logo.png" height="128">
-  <h1 align="center">Water 360</h1>
+  <h1 align="center">Water360</h1>
 </p>
 
 ## Welcome!
