@@ -1,7 +1,8 @@
 body {
-  user-select: none;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
+  /* TODO: in production, uncomment user-select so that users can't select text
+  /* user-select: none;
+  -webkit-user-select: none; 
+  -ms-user-select: none; */
   cursor: default;
 }
 ::-webkit-scrollbar {

@@ -38,7 +38,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { link: "/capture", label: "Capture", icon: IconCamera },
     { link: "/remote", label: "Remote Media", icon: IconSubmarine },
     { link: "/downloads", label: "Downloads", icon: IconEye },
-    { link: "/debug", label: "Debug", icon: IconBug },
+    // { link: "/debug", label: "Debug", icon: IconBug },
     { link: "/settings", label: "Settings", icon: IconSettings },
   ];
   const pathname = usePathname();
@@ -53,8 +53,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       active={Item.link == pathname}
     />
   ));
-  //--TAURI--
-  document.addEventListener("contextmenu", (event) => event.preventDefault());
+  //TODO: in production, uncomment contextmenu so that users can't right click the screen and inspect element
+  // document.addEventListener("contextmenu", (event) => event.preventDefault());
   //--RET--
   return (
     <AppShell

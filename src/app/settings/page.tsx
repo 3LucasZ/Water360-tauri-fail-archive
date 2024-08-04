@@ -51,7 +51,7 @@ export default function Home() {
               const newIP = event.currentTarget.value;
               setIP(newIP);
             }}
-            error={isValidIP(IP) ? "" : "Invalid IP address"} // TODO: add [] around IPv6
+            error={isValidIP(IP) ? "" : "Invalid IP address"} //remember to add [ ] around IP when necessary!
           />
           <TextInput label={"Khadas Mac Address"} value={MAC} disabled />
           <TextInput label={"Downloads folder"} value={downloadsDir} disabled />
