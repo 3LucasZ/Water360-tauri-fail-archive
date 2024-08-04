@@ -47,6 +47,9 @@ export function formatSizePair(size1: number, size2: number): string {
   return size1.toFixed(1) + " / " + size2.toFixed(1) + " " + suffix;
 }
 export function formatSize(size: number): string {
+  if (size == undefined) {
+    return "0 GiB";
+  }
   var suffix = "Bytes";
   if (size >= 1024) {
     suffix = "KiB";

@@ -1,6 +1,7 @@
 "use client";
 
 import { under360 } from "@/services/api_helper";
+import { formatSize } from "@/services/mini_helper";
 import {
   Badge,
   Button,
@@ -194,23 +195,34 @@ function FileCard({
             </Button.Group>
           </Stack>
         </Card>
-        <Modal
-          opened={opened}
-          onClose={close}
-          title="File Information"
-          centered
-        >
-          <List>
-            <List.Item>
-              Resolution: {data.height} x {data.width}
-            </List.Item>
-            <List.Item>FPS: {data.fps}</List.Item>
-            <List.Item>Duration: {data.durationInMs / 1000}</List.Item>
-            <List.Item>Bitrate: {data.bitrate}</List.Item>
-            <List.Item>Filesize: {data.fileSize}</List.Item>
-            <List.Item>Timestamp: {data.creationTime}</List.Item>
-          </List>
-        </Modal>
+        <Box pos="relative">
+          <LoadingOverlay
+            visible={data.height == 0}
+            zIndex={1000}
+            overlayProps={{ radius: "sm", blur: 2 }}
+          />
+          <Modal
+            opened={opened}
+            onClose={close}
+            title="File Information"
+            centered
+          >
+            <List>
+              <List.Item>
+                Resolution: {data.height} x {data.width}
+              </List.Item>
+              <List.Item hidden={fileType == 1}>FPS: {data.fps}</List.Item>
+              <List.Item hidden={fileType == 1}>
+                Duration: {data.durationInMs / 1000}
+              </List.Item>
+              <List.Item hidden={fileType == 1}>
+                Bitrate: {formatSize(data.bitrate)}
+              </List.Item>
+              <List.Item>Filesize: {formatSize(data.fileSize)}</List.Item>
+              {/* <List.Item>Timestamp: {data.creationTime}</List.Item> */}
+            </List>
+          </Modal>
+        </Box>
       </Box>
     </>
   );
