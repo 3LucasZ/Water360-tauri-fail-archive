@@ -218,7 +218,7 @@ function MemoryDisplay({
         <Group>
           {/* <IconDeviceSdCard style={{ width: 18, height: 18 }} /> */}
           <Text c="dimmed" size="xs" tt="uppercase" fw={700}>
-            {"storage"}
+            {"storage used"}
           </Text>
         </Group>
         <Text fw={700} size="xl">
