@@ -2,6 +2,7 @@
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "./global.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import Layout from "@/components/Layout";
