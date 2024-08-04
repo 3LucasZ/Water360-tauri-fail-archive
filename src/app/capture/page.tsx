@@ -138,7 +138,7 @@ export default function Home() {
 
   return (
     <Center>
-      <Stack maw={600}>
+      <Stack w={responsiveBodyWidth}>
         <SegmentedControl
           value={mode}
           onChange={(value) => {
@@ -158,9 +158,7 @@ export default function Home() {
             };
           })}
         />
-
         <Box
-          w={responsiveBodyWidth}
           style={(theme) => ({
             borderRadius: theme.radius.lg,
             overflow: "hidden",
