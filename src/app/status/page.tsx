@@ -1,6 +1,7 @@
 "use client";
 
 import { api, under360 } from "@/services/api_helper";
+import { formatSize, formatSizePair } from "@/services/mini_helper";
 import {
   Alert,
   Badge,
@@ -12,15 +13,21 @@ import {
   Card,
   Progress,
   Button,
+  ActionIcon,
+  Flex,
 } from "@mantine/core";
 import { RingProgress, SimpleGrid, Center, Group, rem } from "@mantine/core";
 import {
   IconArrowUpRight,
   IconArrowDownRight,
   IconSpace,
+  IconCheck,
+  IconSdk,
+  IconDeviceSdCard,
 } from "@tabler/icons-react";
 import { IconAlertCircle } from "@tabler/icons-react";
 import commandExists from "command-exists";
+import { warn } from "console";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -30,9 +37,12 @@ export default function Home() {
   const [pingable, setPingable] = useState(undefined);
   const [adbConnected, setAdbConnected] = useState(undefined);
   const [isAppRun, setIsAppRun] = useState(undefined);
+  const [df, setDf] = useState({ freeSpace: 0, totalSpace: 0 });
   //cam status
   const [camStatus, setCamStatus] = useState({
     connected: undefined,
+    freeSpace: 0,
+    totalSpace: 0,
   });
   //initial data fetch
   useEffect(() => {
@@ -50,6 +60,7 @@ export default function Home() {
     api("/khadas/isAppRun").then((res) =>
       res.json().then((json) => setIsAppRun(json["isAppRun"]))
     );
+    api("/khadas/df").then((res) => res.json().then((json) => setDf(json)));
     //cam status
     under360("/status").then((res) =>
       res.json().then((json) => setCamStatus(json))
@@ -62,83 +73,92 @@ export default function Home() {
   return (
     <Stack>
       <DeviceCard name="Ground Station">
-        <Badge
-          color={adbInstalled ? "green" : "red"}
-          hidden={adbInstalled == undefined}
-        >
-          ADB {adbInstalled ? "installed" : "not found"}
-        </Badge>
+        <Center>
+          <Group>
+            <Badge
+              color={adbInstalled ? "green" : "red"}
+              hidden={adbInstalled == undefined}
+            >
+              ADB {adbInstalled ? "installed" : "not found"}
+            </Badge>
+          </Group>
+        </Center>
       </DeviceCard>
       <DeviceCard name="Khadas">
-        <SimpleGrid cols={2}>
-          <Container>
-            <Badge
-              color={pingable ? "green" : "red"}
-              hidden={pingable == undefined}
-            >
+        <Center>
+          <Group>
+            <Badge color={pingable ? "green" : "red"}>
               {pingable ? "detected" : "unpingable"}
             </Badge>
-
-            <Badge
-              color={adbConnected ? "green" : "red"}
-              hidden={adbConnected == undefined}
-            >
+            <Badge color={adbConnected ? "green" : "red"}>
               {adbConnected ? "connected" : "disconnected"}
             </Badge>
-            <Badge
-              color={isAppRun ? "green" : "red"}
-              hidden={isAppRun == undefined}
-            >
+            <Badge color={isAppRun ? "green" : "red"}>
               {isAppRun ? "app on" : "app off"}
             </Badge>
-          </Container>
-          <MemoryDisplay used={30} total={100} />
+          </Group>
+        </Center>
+        <SimpleGrid cols={2}>
+          <Stack>
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/wol");
+              }}
+              maw={300}
+            >
+              Wake
+            </Button>
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/connect");
+              }}
+              maw={300}
+            >
+              Connect
+            </Button>
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                api("/khadas/runApp");
+              }}
+              maw={300}
+            >
+              Start Activity
+            </Button>
+          </Stack>
+          <MemoryDisplay freeSpace={df.freeSpace} totalSpace={df.totalSpace} />
         </SimpleGrid>
-        <Button
-          radius={"xl"}
-          onClick={() => {
-            api("/khadas/wol");
-          }}
-        >
-          Wake
-        </Button>
-        <Button
-          radius={"xl"}
-          onClick={() => {
-            api("/khadas/connect");
-          }}
-        >
-          Connect
-        </Button>
-        <Button
-          radius={"xl"}
-          onClick={() => {
-            api("/khadas/runApp");
-          }}
-        >
-          Start Activity
-        </Button>
       </DeviceCard>
       <DeviceCard name="Camera">
-        <SimpleGrid cols={2}>
-          <Container>
+        <Center>
+          <Group>
             <Badge
               color={camStatus.connected ? "green" : "red"}
               hidden={camStatus.connected == undefined}
             >
               {camStatus.connected ? "Connected" : "Disconnected"}
             </Badge>
-          </Container>
-          <MemoryDisplay used={30} total={100} />
+          </Group>
+        </Center>
+        <SimpleGrid cols={2}>
+          <Stack>
+            <Button
+              radius={"xl"}
+              onClick={() => {
+                under360("/command/connect");
+              }}
+              maw={300}
+            >
+              Connect
+            </Button>
+          </Stack>
+          <MemoryDisplay
+            freeSpace={camStatus.freeSpace}
+            totalSpace={camStatus.totalSpace}
+          />
         </SimpleGrid>
-        <Button
-          radius={"xl"}
-          onClick={() => {
-            under360("/command/connect");
-          }}
-        >
-          Connect
-        </Button>
       </DeviceCard>
     </Stack>
   );
@@ -162,39 +182,49 @@ function DeviceCard({
     </Paper>
   );
 }
-function MemoryDisplay({ used, total }: { used: number; total: number }) {
-  const usedPercent = Math.round((100 * used) / total);
+function MemoryDisplay({
+  freeSpace,
+  totalSpace,
+}: {
+  freeSpace: number;
+  totalSpace: number;
+}) {
+  const usedSpace = totalSpace - freeSpace;
+  const usedPercent =
+    totalSpace > 0 ? Math.round((100 * usedSpace) / totalSpace) : 0;
+  const warningLevel = usedPercent < 33 ? 0 : usedPercent < 66 ? 1 : 2;
 
   return (
-    <Paper
-      // withBorder
-      radius="md"
-      // p="xs"
-    >
-      <Group>
-        <RingProgress
-          size={80}
-          roundCaps
-          thickness={8}
-          sections={[{ value: usedPercent, color: "blue" }]}
-          label={
-            <Center>
-              <IconSpace
-                style={{ width: rem(20), height: rem(20) }}
-                stroke={1.5}
-              />
-            </Center>
-          }
-        />
-        <div>
+    <Group align="top">
+      <RingProgress
+        size={80}
+        roundCaps
+        thickness={8}
+        sections={[
+          {
+            value: usedPercent,
+            color:
+              warningLevel == 0 ? "blue" : warningLevel == 1 ? "yellow" : "red",
+          },
+        ]}
+        // label={
+        //   <Center>
+        //     <IconDeviceSdCard style={{ width: rem(22), height: rem(22) }} />
+        //   </Center>
+        // }
+        // visibleFrom="sm"
+      />
+      <div>
+        <Group>
+          {/* <IconDeviceSdCard style={{ width: 18, height: 18 }} /> */}
           <Text c="dimmed" size="xs" tt="uppercase" fw={700}>
             {"storage"}
           </Text>
-          <Text fw={700} size="xl">
-            {used + "/" + total}
-          </Text>
-        </div>
-      </Group>
-    </Paper>
+        </Group>
+        <Text fw={700} size="xl">
+          {totalSpace > 0 ? formatSizePair(usedSpace, totalSpace) : "0 / 0 GiB"}
+        </Text>
+      </div>
+    </Group>
   );
 }

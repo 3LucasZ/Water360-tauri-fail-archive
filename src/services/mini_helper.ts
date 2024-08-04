@@ -26,3 +26,39 @@ export function isValidIP(ip: string, v6?: boolean) {
   if (v6) return ipv6Pattern.test(ip);
   return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
 }
+
+export function formatSizePair(size1: number, size2: number): string {
+  var suffix = "Bytes";
+  if (size2 >= 1024) {
+    suffix = "KiB";
+    size1 /= 1024;
+    size2 /= 1024;
+    if (size2 >= 1024) {
+      suffix = "MiB";
+      size1 /= 1024;
+      size2 /= 1024;
+      if (size2 >= 1024) {
+        suffix = "GiB";
+        size1 /= 1024;
+        size2 /= 1024;
+      }
+    }
+  }
+  return size1.toFixed(1) + " / " + size2.toFixed(1) + " " + suffix;
+}
+export function formatSize(size: number): string {
+  var suffix = "Bytes";
+  if (size >= 1024) {
+    suffix = "KiB";
+    size /= 1024;
+    if (size >= 1024) {
+      suffix = "MiB";
+      size /= 1024;
+      if (size >= 1024) {
+        suffix = "GiB";
+        size /= 1024;
+      }
+    }
+  }
+  return size.toFixed(2) + " " + suffix;
+}
