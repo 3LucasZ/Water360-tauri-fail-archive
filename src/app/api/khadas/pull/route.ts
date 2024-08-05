@@ -7,37 +7,50 @@ import fs from "fs";
 import { write } from "node:fs";
 
 export async function POST(request: NextRequest) {
-  const connector: AdbServerNodeTcpConnector = new AdbServerNodeTcpConnector({
-    host: "localhost",
-    port: 5037,
-  });
-  const client: AdbServerClient = new AdbServerClient(connector);
-  const selector: AdbServerClient.DeviceSelector = undefined;
-  const transport: AdbTransport = await client.createTransport(selector);
-  const adb: Adb = new Adb(transport);
-  const sync: AdbSync = await adb.sync();
-
-  const fileName = "IMG_20230621_051555_00_002.jpg";
-
-  console.log("pull:");
-  const content = sync.read(
-    "/storage/emulated/0/Pictures/SDK_DEMO_EXPORT/" + fileName
-  );
-  let exists = await fsPromises
-    .access(fileName)
-    .then(() => true)
-    .catch(() => false);
-  console.log(exists);
-  var writeStream = fs.createWriteStream(fileName, { flags: "w" });
-
-  await content.pipeTo(
-    new WritableStream({
-      write(chunk) {
-        writeStream.write(chunk);
-      },
-    })
-  );
-
-  writeStream.close();
-  return NextResponse.json({ message: "ok" }, { status: 200 });
+  try {
+    //get data
+    const fileName = (await request.json())["url"];
+    const filePath = "/storage/emulated/0/Pictures/SDK_DEMO_EXPORT/" + fileName;
+    //adb setup
+    const connector: AdbServerNodeTcpConnector = new AdbServerNodeTcpConnector({
+      host: "localhost",
+      port: 5037,
+    });
+    const client: AdbServerClient = new AdbServerClient(connector);
+    const selector: AdbServerClient.DeviceSelector = undefined;
+    const transport: AdbTransport = await client.createTransport(selector);
+    const adb: Adb = new Adb(transport);
+    const sync: AdbSync = await adb.sync();
+    //pull file asynchronously
+    console.log("pull:");
+    const content = sync.read(filePath);
+    let fileExists = await fsPromises
+      .access(fileName)
+      .then(() => true)
+      .catch(() => false);
+    console.log("fileExists", fileExists);
+    var writeStream = fs.createWriteStream(fileName, { flags: "w" });
+    global.exporting = true;
+    global.exportSoFar = 0;
+    global.exportTotal = Number((await sync.lstat(filePath)).size);
+    content
+      .pipeTo(
+        new WritableStream({
+          write(chunk) {
+            //pull content
+            writeStream.write(chunk);
+            global.exportSoFar += chunk.length;
+          },
+        })
+      )
+      .finally(() => {
+        //clean up on end
+        writeStream.close();
+        global.exporting = false;
+      });
+    //ret
+    return NextResponse.json({ msg: "ok" }, { status: 200 });
+  } catch (e) {
+    return NextResponse.json({ err: e }, { status: 500 });
+  }
 }
