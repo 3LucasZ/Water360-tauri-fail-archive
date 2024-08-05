@@ -9,6 +9,7 @@ import {
   useMantineColorScheme,
   ActionIcon,
   useComputedColorScheme,
+  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -60,7 +61,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: 300,
+        width: 200,
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}

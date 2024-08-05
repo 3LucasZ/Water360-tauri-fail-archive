@@ -64,5 +64,5 @@ export function formatSize(size: number): string {
       }
     }
   }
-  return size.toFixed(2) + " " + suffix;
+  return size.toFixed(1) + " " + suffix;
 }
