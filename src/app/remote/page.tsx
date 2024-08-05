@@ -1,50 +1,24 @@
 "use client";
 
-import { under360 } from "@/services/api_helper";
-import { formatSize, formatTime } from "@/services/mini_helper";
-import {
-  Badge,
-  Button,
-  Card,
-  Group,
-  SimpleGrid,
-  Title,
-  Image,
-  Text,
-  Stack,
-  ActionIcon,
-  Flex,
-  Grid,
-  Box,
-  Container,
-  TextInput,
-  Table,
-  Modal,
-  List,
-  LoadingOverlay,
-  Center,
-  Loader,
-  Skeleton,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import FileCard from "@/components/FileCard";
+import { api, under360 } from "@/services/api_helper";
+import { SimpleGrid, Stack, TextInput, Center, Loader } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import {
-  IconDownload,
-  IconFileExport,
-  IconFileInfo,
-  IconInfoCircle,
-  IconSearch,
-  IconTrash,
-  IconTrashOff,
-  IconTrashX,
-} from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [search, setSearch] = useState("");
-  const [urls, setUrls] = useState<string[]>([]);
-  const [urlsLoading, setUrlsLoading] = useState(true);
-  async function getData() {
+  // TODO: optional feature if requested
+  // const [onCameraFilter, setOnCameraFilter] = useState(undefined);
+  // const [fileTypeFilter, setFileTypeFilter] = useState(undefined);
+
+  const [cameraUrls, setCameraUrls] = useState<string[]>([]);
+  const [cameraUrlsLoading, setCameraUrlsLoading] = useState(true);
+  const [khadasUrls, setKhadasUrls] = useState<string[]>([]);
+  const [khadasUrlsLoading, setKhadasUrlsLoading] = useState(true);
+
+  async function getServerSideProps() {
     under360("/ls").then((res) =>
       res.json().then((json) => {
         if (res.status != 200) {
@@ -54,45 +28,70 @@ export default function Home() {
             color: "red",
           });
         } else {
-          setUrls(json["data"]);
+          setCameraUrls(json["data"]);
         }
-        setUrlsLoading(false);
+        setCameraUrlsLoading(false);
+      })
+    );
+    api("/khadas/ls").then((res) =>
+      res.json().then((json) => {
+        if (res.status != 200) {
+          notifications.show({
+            title: "Error",
+            message: json["err"],
+            color: "red",
+          });
+        } else {
+          setKhadasUrls(json["data"]);
+        }
+        setKhadasUrlsLoading(false);
       })
     );
   }
   useEffect(() => {
-    getData();
+    getServerSideProps();
   }, []);
-  const cards = urls
+  const cards = cameraUrls
+    .concat(khadasUrls)
     .filter(
       (url) =>
         url.toLowerCase().match(search.toLowerCase()) && !url.match("LRV")
     )
     .map((url) => {
+      console.log(url);
       const fileName = url.substring(url.lastIndexOf("/") + 1);
+      const onCamera = url.includes("http");
+      const filePrefix = fileName.substring(0, 3);
+      const fileSuffix = url.split(".").pop();
       const fileType =
-        url.split(".").pop() == "insp"
+        fileSuffix == "insp" || fileSuffix == "jpg"
           ? 1
-          : fileName.substring(0, 3) == "LRV"
+          : filePrefix == "LRV"
           ? 3
           : 2;
-      const dateStr = url.split("_")[1];
-      const yr = Number(dateStr.substring(0, 4));
-      const m = Number(dateStr.substring(4, 6));
-      const d = Number(dateStr.substring(6, 8));
-      const timeStr = url.split("_")[2];
-      const hr = Number(timeStr.substring(0, 2));
-      const min = Number(timeStr.substring(2, 4));
-      const sec = Number(timeStr.substring(4, 6));
-      const date = new Date(Date.UTC(yr, m, d, hr, min, sec));
+      var date = new Date();
+      try {
+        const dateStr = url.split("_")[1];
+        const yr = Number(dateStr.substring(0, 4));
+        const m = Number(dateStr.substring(4, 6));
+        const d = Number(dateStr.substring(6, 8));
+        const timeStr = url.split("_")[2];
+        const hr = Number(timeStr.substring(0, 2));
+        const min = Number(timeStr.substring(2, 4));
+        const sec = Number(timeStr.substring(4, 6));
+        date = new Date(Date.UTC(yr, m, d, hr, min, sec));
+      } catch (e) {
+        //in the case that the filename glitches and doesn't have the prescribed format...
+      }
       return (
         <FileCard
           key={url}
           filePath={url}
           fileName={fileName}
+          onCamera={onCamera}
           fileType={fileType}
           date={date.toLocaleString()}
-          refresh={getData}
+          refresh={getServerSideProps}
         />
       );
     });
@@ -108,7 +107,7 @@ export default function Home() {
             setSearch(event.target.value);
           }}
         />
-        {urlsLoading && (
+        {cameraUrlsLoading && (
           <Center h="300" mah={"50vh"}>
             <Loader size={"xl"} type="bars" color="pink" />
           </Center>
@@ -118,140 +117,5 @@ export default function Home() {
         </SimpleGrid>
       </Stack>
     </>
-  );
-}
-function FileCard({
-  refresh,
-  filePath,
-  fileName,
-  fileType,
-  date,
-}: {
-  refresh: Function;
-  filePath: string;
-  fileName: string;
-  fileType: number;
-  date: string;
-}) {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [data, setData] = useState({
-    height: 0,
-    width: 0,
-    fileSize: 0,
-    fps: 0,
-    durationInMs: 0,
-    bitrate: 0,
-    creationTime: 0,
-  });
-  useEffect(() => {
-    under360("/inspect", { url: filePath }).then((res) =>
-      res.json().then((json) => setData(json))
-    );
-  }, []);
-  const [isDeleting, setIsDeleting] = useState(false);
-  return (
-    <Box pos="relative">
-      <LoadingOverlay
-        visible={isDeleting}
-        zIndex={1000}
-        overlayProps={{
-          radius: "sm",
-          blur: 2,
-        }}
-      />
-      <Card radius="md" withBorder>
-        <Stack>
-          <Text fw={500} truncate="end">
-            {date}
-          </Text>
-          <Badge
-            color={
-              fileType == 1 ? "indigo" : fileType == 2 ? "grape" : "violet"
-            }
-          >
-            {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
-          </Badge>
-          <Skeleton visible={data.creationTime == 0}>
-            <Text>Filesize: {formatSize(data.fileSize)}</Text>
-          </Skeleton>
-          <Skeleton visible={data.creationTime == 0}>
-            <Text>
-              {fileType == 2
-                ? "Duration: " + formatTime(data.durationInMs / 1000)
-                : "Resolution: " + data.height + " x " + data.width}
-            </Text>
-          </Skeleton>
-          <Button.Group miw={"100%"}>
-            <Button
-              color="yellow"
-              variant="light"
-              miw="40"
-              px="0"
-              disabled={data.creationTime == 0}
-              onClick={async () => {
-                open();
-              }}
-            >
-              <IconFileInfo stroke={1.5} />
-            </Button>
-            <Button
-              color="blue"
-              variant="light"
-              fullWidth
-              leftSection={<IconDownload stroke={1.5} />}
-            >
-              Export
-            </Button>
-            <Button
-              color="red"
-              variant="light"
-              miw="40"
-              px="0"
-              onClick={async () => {
-                await under360("/rm", { url: filePath });
-                setIsDeleting(true);
-                setTimeout(() => {
-                  setIsDeleting(false);
-                  refresh();
-                }, 5000);
-              }}
-            >
-              <IconTrash stroke={1.5} />
-            </Button>
-          </Button.Group>
-        </Stack>
-      </Card>
-      <Box pos="relative">
-        <LoadingOverlay
-          visible={data.height == 0}
-          zIndex={1000}
-          overlayProps={{ radius: "sm", blur: 2 }}
-        />
-        <Modal
-          opened={opened}
-          onClose={close}
-          title="File Information"
-          centered
-        >
-          <List>
-            <List.Item>Filesize: {formatSize(data.fileSize)}</List.Item>
-            <List.Item>
-              Resolution: {data.height} x {data.width}
-            </List.Item>
-            <List.Item hidden={fileType == 1}>FPS: {data.fps}</List.Item>
-            <List.Item hidden={fileType == 1}>
-              Duration: {formatTime(data.durationInMs / 1000)}
-            </List.Item>
-            <List.Item hidden={fileType == 1}>
-              Bitrate: {formatSize(data.bitrate)}
-            </List.Item>
-            {/* <List.Item>
-              Timestamp: {new Date(data.creationTime).toLocaleString()}
-            </List.Item> */}
-            <List.Item>ID: {data.creationTime}</List.Item>
-          </List>
-        </Modal>
-      </Box>
-    </Box>
   );
 }
