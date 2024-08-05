@@ -22,6 +22,14 @@
           "$DOWNLOAD/Water360/*",
           "$DOWNLOAD/Water360"
         ]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": [
+          "$DOWNLOAD/Water360/**",
+          "$DOWNLOAD/Water360/*",
+          "$DOWNLOAD/Water360"
+        ]
       }
     },
     "bundle": {

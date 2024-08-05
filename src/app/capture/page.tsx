@@ -24,6 +24,7 @@ import { api, under360 } from "@/services/api_helper";
 import Image360 from "@/components/Image360";
 import { responsiveBodyWidth } from "@/services/constants";
 import { isValidIP } from "@/services/mini_helper";
+import PlaceholderImage from "@/components/PlaceholderImage";
 // import WebSocket from "ws";
 
 export default function Home() {
@@ -167,12 +168,9 @@ export default function Home() {
           {previewData.length > 1 ? (
             <Image360 url={"data:image/png;base64," + previewData} />
           ) : (
-            <AspectRatio ratio={1080 / 720}>
-              <Image alt="" bg={"dark.0"} />
-            </AspectRatio>
+            <PlaceholderImage />
           )}
         </Box>
-
         {footer}
       </Stack>
     </Center>
