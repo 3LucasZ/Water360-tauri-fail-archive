@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
   const files = await sync.readdir(
     "/storage/emulated/0/Pictures/SDK_DEMO_EXPORT"
   );
-  for (const file of files) {
-    console.log(file.name);
-  }
-
-  return NextResponse.json({ message: "ok" }, { status: 200 });
+  const fileNames = files.map((file) => file.name);
+  return NextResponse.json({ data: fileNames }, { status: 200 });
 }
