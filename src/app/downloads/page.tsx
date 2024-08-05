@@ -2,8 +2,10 @@
 
 import FileCard from "@/components/FileCard";
 import Image360 from "@/components/Image360";
+import PlaceholderImage from "@/components/PlaceholderImage";
 import Video360 from "@/components/Video360";
 import { api, under360 } from "@/services/api_helper";
+import { responsiveBodyWidth } from "@/services/constants";
 import { formatSize, formatTime } from "@/services/mini_helper";
 import {
   Badge,
@@ -16,15 +18,28 @@ import {
   Stack,
   Title,
   Text,
+  ActionIcon,
+  Box,
+  AspectRatio,
+  Image,
+  Center,
 } from "@mantine/core";
-import { IconDownload, IconFileInfo, IconTrash } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconEye,
+  IconFileInfo,
+  IconTrash,
+} from "@tabler/icons-react";
 import { BaseDirectory, readDir } from "@tauri-apps/api/fs";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { lstat } from "fs";
 import { data } from "node-persist";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [filePaths, setFilePaths] = useState<string[]>([]);
+  const [tarUrl, setTarUrl] = useState("");
+  const tarUrlSuffix = tarUrl.split(".").pop();
   useEffect(() => {
     function getServerSideProps() {
       readDir("Water360", { dir: BaseDirectory.Download }).then((files) =>
@@ -48,13 +63,25 @@ export default function Home() {
         filePath={url}
         fileName={fileName}
         fileType={fileType}
+        setTar={setTarUrl}
       />
     );
   });
   return (
     <Stack>
-      {/* <Image360 url={"360.jpg"} />
-      <Video360 url={"360.mp4"} /> */}
+      <Center>
+        <Box w={responsiveBodyWidth}>
+          {tarUrl == "" ? (
+            <PlaceholderImage />
+          ) : tarUrlSuffix == "jpg" ? (
+            <Image360 url={convertFileSrc(tarUrl)} />
+          ) : tarUrlSuffix == "mp4" ? (
+            <Video360 url={convertFileSrc(tarUrl)} />
+          ) : (
+            <PlaceholderImage />
+          )}
+        </Box>
+      </Center>
       <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }}>
         {cards}
       </SimpleGrid>
@@ -66,10 +93,12 @@ function SimpleFileCard({
   filePath,
   fileName,
   fileType,
+  setTar,
 }: {
   filePath: string;
   fileName: string;
   fileType: number;
+  setTar: Function;
 }) {
   const [fileSize, setFileSize] = useState(0);
   function getServerSideProps() {
@@ -95,6 +124,17 @@ function SimpleFileCard({
             {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
           </Badge>
           <Text>Size: {formatSize(fileSize)}</Text>
+          <Flex justify={"flex-end"} direction="row" style={{ flexGrow: 1 }}>
+            <ActionIcon
+              variant="default"
+              size="md"
+              onClick={() => {
+                setTar(filePath);
+              }}
+            >
+              <IconEye stroke={1.5} />
+            </ActionIcon>
+          </Flex>
         </Group>
       </Stack>
     </Card>
