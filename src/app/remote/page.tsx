@@ -1,7 +1,7 @@
 "use client";
 
 import { under360 } from "@/services/api_helper";
-import { formatSize } from "@/services/mini_helper";
+import { formatSize, formatTime } from "@/services/mini_helper";
 import {
   Badge,
   Button,
@@ -24,6 +24,7 @@ import {
   LoadingOverlay,
   Center,
   Loader,
+  Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -161,9 +162,8 @@ function FileCard({
       <Card radius="md" withBorder>
         <Stack>
           <Text fw={500} truncate="end">
-            {fileName}
+            {date}
           </Text>
-
           <Badge
             color={
               fileType == 1 ? "indigo" : fileType == 2 ? "grape" : "violet"
@@ -171,13 +171,23 @@ function FileCard({
           >
             {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
           </Badge>
-          <Text>{date}</Text>
+          <Skeleton visible={data.creationTime == 0}>
+            <Text>Filesize: {formatSize(data.fileSize)}</Text>
+          </Skeleton>
+          <Skeleton visible={data.creationTime == 0}>
+            <Text>
+              {fileType == 2
+                ? "Duration: " + formatTime(data.durationInMs / 1000)
+                : "Resolution: " + data.height + " x " + data.width}
+            </Text>
+          </Skeleton>
           <Button.Group miw={"100%"}>
             <Button
               color="yellow"
               variant="light"
               miw="40"
               px="0"
+              disabled={data.creationTime == 0}
               onClick={async () => {
                 open();
               }}
@@ -224,20 +234,21 @@ function FileCard({
           centered
         >
           <List>
+            <List.Item>Filesize: {formatSize(data.fileSize)}</List.Item>
             <List.Item>
               Resolution: {data.height} x {data.width}
             </List.Item>
             <List.Item hidden={fileType == 1}>FPS: {data.fps}</List.Item>
             <List.Item hidden={fileType == 1}>
-              Duration: {data.durationInMs / 1000}
+              Duration: {formatTime(data.durationInMs / 1000)}
             </List.Item>
             <List.Item hidden={fileType == 1}>
               Bitrate: {formatSize(data.bitrate)}
             </List.Item>
-            <List.Item>Filesize: {formatSize(data.fileSize)}</List.Item>
-            <List.Item>
+            {/* <List.Item>
               Timestamp: {new Date(data.creationTime).toLocaleString()}
-            </List.Item>
+            </List.Item> */}
+            <List.Item>ID: {data.creationTime}</List.Item>
           </List>
         </Modal>
       </Box>
