@@ -19,6 +19,7 @@ import {
 } from "@mantine/core";
 import { IconDownload, IconFileInfo, IconTrash } from "@tabler/icons-react";
 import { BaseDirectory, readDir } from "@tauri-apps/api/fs";
+import { lstat } from "fs";
 import { data } from "node-persist";
 import { useEffect, useState } from "react";
 
@@ -70,6 +71,15 @@ function SimpleFileCard({
   fileName: string;
   fileType: number;
 }) {
+  const [fileSize, setFileSize] = useState(0);
+  function getServerSideProps() {
+    api("/station/lstat", { url: filePath }).then((res) =>
+      res.json().then((json) => setFileSize(json["fileSize"]))
+    );
+  }
+  useEffect(() => {
+    getServerSideProps();
+  });
   return (
     <Card radius="md" withBorder>
       <Stack>
@@ -84,6 +94,7 @@ function SimpleFileCard({
           >
             {fileType == 1 ? "IMAGE" : fileType == 2 ? "VIDEO" : "TMP"}
           </Badge>
+          <Text>Size: {formatSize(fileSize)}</Text>
         </Group>
       </Stack>
     </Card>
