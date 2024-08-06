@@ -7,7 +7,7 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "water360",
+    "productName": "Water360",
     "version": "0.1.0"
   },
   "tauri": {
