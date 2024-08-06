@@ -1,26 +1,11 @@
 "use client";
 
-import {
-  Button,
-  Center,
-  Flex,
-  PasswordInput,
-  Stack,
-  TextInput,
-  Notification,
-} from "@mantine/core";
+import { Button, Flex, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { downloadDir } from "@tauri-apps/api/path";
 import { isValidIP } from "@/services/mini_helper";
-import {
-  IconCancel,
-  IconDeviceFloppy,
-  IconEdit,
-  IconX,
-} from "@tabler/icons-react";
+import { IconDeviceFloppy, IconX } from "@tabler/icons-react";
 import { responsiveBodyWidth } from "@/services/constants";
 import { api } from "@/services/api_helper";
-import { useRouter } from "next/navigation";
 import { notifications } from "@mantine/notifications";
 
 export default function Home() {
@@ -29,16 +14,23 @@ export default function Home() {
   const [downloadsDir, setDownloadsDir] = useState("");
   const [RTMP, setRTMP] = useState("");
 
-  const load = async () => {
-    const settings = await (await api("/station/getSettings")).json();
-    setIP(settings["IP"]);
-    setMAC(settings["MAC"]);
-    setDownloadsDir(settings["downloadsDir"] || (await downloadDir()));
-    setRTMP(settings["RTMP"]);
-  };
   useEffect(() => {
-    load();
+    getServerSideProps();
   }, []);
+  function getServerSideProps() {
+    import("@tauri-apps/api/path").then((path) => {
+      path.downloadDir().then((defaultDownloadDir) => {
+        api("/station/getSettings").then((res) =>
+          res.json().then((settings) => {
+            setIP(settings["IP"]);
+            setMAC(settings["MAC"]);
+            setDownloadsDir(settings["downloadsDir"] || defaultDownloadDir);
+            setRTMP(settings["RTMP"]);
+          })
+        );
+      });
+    });
+  }
 
   return (
     <>
@@ -67,7 +59,7 @@ export default function Home() {
             <Button
               size="sm"
               onClick={() => {
-                load();
+                getServerSideProps();
               }}
               color="red"
               leftSection={<IconX stroke={1.5} />}
@@ -104,7 +96,6 @@ export default function Home() {
                     color: "red",
                   });
                 }
-                // router.refresh();
               }}
               color="blue"
               leftSection={<IconDeviceFloppy stroke={1.5} />}

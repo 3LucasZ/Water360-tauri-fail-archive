@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     v6: isIPv6(IP),
   };
   var pingable = false;
+  // @ts-ignore --cfg.timeout was implemented incorrectly. we override the type-checking to allow both number and boolean for cfg.timeout.
   pingable = (await promise.probe(IP, cfg)).alive;
   console.log("pingable", pingable);
   //return
